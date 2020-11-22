@@ -1,8 +1,7 @@
 package my_project.control;
 
-import KAGO_framework.control.DatabaseController;
 import KAGO_framework.control.ViewController;
-import my_project.model.House;
+import my_project.view.DatabaseGUI;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;
@@ -34,12 +33,12 @@ public class ProgramController {
      * Diese Methode wird genau ein mal nach Programmstart aufgerufen. Achtung: funktioniert nicht im Szenario-Modus
      */
     public void startProgram() {
-        //Hier wird eine lokale Referenz für ein House-Objekt angelegt.
-        House firstHouse = new House();
+        viewController.getDrawFrame().setContentPane(new DatabaseGUI(this).getMainPanel());
+    }
 
-        //Damit die draw-Methode des Objekts hinter firstHouse aufgerufen wird,
-        //muss dem ViewController-Objekt mitgeteilt werden, dass es das House-Objekt zeichnen soll.
-        viewController.draw(firstHouse);
+    public void closeProgram(){
+        // todo Eine eventuelle Datenbankverbindung wird geschlossen. Danach wird das Programm beendet.
+
     }
 
     /**
