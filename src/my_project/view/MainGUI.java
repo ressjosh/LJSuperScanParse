@@ -7,6 +7,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * An dieser Klasse sind keine Modifikationen erforderlich
@@ -50,10 +52,13 @@ public class MainGUI {
         parseButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                outputPane.setText("Analyse um "+dtf.format(now)+" mit Parser "+languageIndex.getValue()+" ergab:\n");
                 if(programController.scanString(inputTextField.getText(),(int)(languageIndex.getValue()))){
-                    outputPane.setText("Scan erfolgreich!");
+                    outputPane.setText(outputPane.getText()+"\nScan erfolgreich!");
                 } else {
-                    outputPane.setText("Scan nicht erfolgreich!");
+                    outputPane.setText(outputPane.getText()+"\nScan nicht erfolgreich!");
                     if(soundCheckBox.isSelected()){
                         programController.playNo();
                     }

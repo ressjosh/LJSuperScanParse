@@ -55,7 +55,8 @@ public class ProgramController {
             case 0:
                 return knebiParser.parse(input);
             // todo Hier können weitere Parser aufgeführt werden
-
+            case 1:
+                return knebiParser.parse(input);
 
             default: System.out.println("\nDebug-Info: Für diesen Index ist kein Parser definiert!");
         }
@@ -75,7 +76,8 @@ public class ProgramController {
                 System.out.println("\n- KnebiScanner-DEBUG - "+knebiParser.getScannerOutput());
                 return result;
             // todo Hier können weitere Scanner aufgeführt werden.
-
+            case 1:
+                return knebiParser.getScannerResult(input);
 
             default: System.out.println("\nDebug-Info: Für diesen Index ist kein Scanner definiert!");
         }
