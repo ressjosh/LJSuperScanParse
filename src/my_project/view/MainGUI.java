@@ -24,10 +24,7 @@ public class MainGUI {
     private JLabel languageLabel;
     private JCheckBox soundCheckBox;
 
-    private ProgramController programController;
-
     public MainGUI(ProgramController programController) {
-        this.programController = programController;
         languageIndex.setModel(new SpinnerNumberModel());
         ((SpinnerNumberModel)languageIndex.getModel()).setMinimum(0);
         ((SpinnerNumberModel)languageIndex.getModel()).setStepSize(1);
