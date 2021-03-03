@@ -1,9 +1,9 @@
 package my_project.control;
 
 import KAGO_framework.control.ViewController;
-import my_project.view.DatabaseGUI;
+import my_project.model.KnebiParser;
+import my_project.view.MainGUI;
 
-import javax.swing.*;
 import java.awt.event.MouseEvent;
 
 /**
@@ -17,6 +17,7 @@ public class ProgramController {
 
     // Referenzen
     private ViewController viewController;  // diese Referenz soll auf ein Objekt der Klasse viewController zeigen. Über dieses Objekt wird das Fenster gesteuert.
+    private KnebiParser knebiParser;
 
     /**
      * Konstruktor
@@ -33,13 +34,55 @@ public class ProgramController {
      * Diese Methode wird genau ein mal nach Programmstart aufgerufen. Achtung: funktioniert nicht im Szenario-Modus
      */
     public void startProgram() {
-        viewController.getDrawFrame().setContentPane(new DatabaseGUI(this).getMainPanel());
+        viewController.getDrawFrame().setSize(600,320);
+        viewController.getDrawFrame().setContentPane(new MainGUI(this).getMainPanel());
+        viewController.getSoundController().loadSound("assets/yesyesyes.mp3","yes",false);
+        viewController.getSoundController().loadSound("assets/nonono.mp3","no",false);
+        knebiParser = new KnebiParser();
+        // todo Eigener Code
+
+
     }
 
-    public void closeProgram(){
-        // todo Eine eventuelle Datenbankverbindung wird geschlossen. Danach wird das Programm beendet.
+    /**
+     * Diese Methode parst den übergebenen String mit einem Parser einer Sprache.
+     * @param input der zu parsende String
+     * @param parserIndex der Index des zu verwendenden Parsers (0 = Knebiparser, Rest ist frei)
+     * @return true, fallse der String ein Wort der Sprache des Parsers ist.
+     */
+    public boolean parseString(String input, int parserIndex){
+        switch(parserIndex){
+            case 0:
+                return knebiParser.parse(input);
+            // todo Hier können weitere Parser aufgeführt werden
 
+
+            default: System.out.println("\nDebug-Info: Für diesen Index ist kein Parser definiert!");
+        }
+        return false;
     }
+
+    /**
+     * Der übergebene String wird gescannt.
+     * @param input der zu scannende String
+     * @param parserIndex der zu verwendende Scanner (ist dem Parser zugeordnet, daher Parserindex)
+     * @return true, falls der Scan erfolgreich war, andernfalls false
+     */
+    public boolean scanString(String input, int parserIndex){
+        switch(parserIndex){
+            case 0:
+                boolean result = knebiParser.getScannerResult(input);
+                System.out.println("\n- KnebiScanner-DEBUG - "+knebiParser.getScannerOutput());
+                return result;
+            // todo Hier können weitere Scanner aufgeführt werden.
+
+
+            default: System.out.println("\nDebug-Info: Für diesen Index ist kein Scanner definiert!");
+        }
+        return false;
+    }
+
+    // ********* FRAMEWORK-METHODEN *************
 
     /**
      * Sorgt dafür, dass zunächst gewartet wird, damit der SoundController die
@@ -58,5 +101,13 @@ public class ProgramController {
      */
     public void mouseClicked(MouseEvent e){
 
+    }
+
+    public void playYes(){
+        viewController.getSoundController().playSound("yes");
+    }
+
+    public void playNo(){
+        viewController.getSoundController().playSound("no");
     }
 }
