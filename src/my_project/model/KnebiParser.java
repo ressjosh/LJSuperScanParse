@@ -21,7 +21,7 @@ public class KnebiParser implements Parser {
                     while (scanner.getType().equals("MIDDLE")) scanner.nextToken();
                     if (scanner.getType().equals("END")) {
                         scanner.nextToken();
-                        if (scanner.getType() == null) return true;
+                        if (scanner.getType().equals("NODATA")) return true;
                     }
                 }
             }
@@ -72,7 +72,7 @@ public class KnebiParser implements Parser {
     private boolean checkB(){
         if (scanner.getType().equals("END")) {
             scanner.nextToken();
-            if (scanner.getType() == null) return true;
+            if (scanner.getType().equals("NODATA")) return true;
         }
         return false;
     }

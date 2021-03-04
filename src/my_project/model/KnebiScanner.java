@@ -41,6 +41,7 @@ public class KnebiScanner extends Scanner<String,String> {
                 }
             } else return false;
         }
+        this.tokenList.append(new Token("#","NODATA"));
         tokenList.toFirst(); // WICHTIG!
         return true;
     }
