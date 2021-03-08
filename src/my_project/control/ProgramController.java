@@ -2,6 +2,8 @@ package my_project.control;
 
 import KAGO_framework.control.ViewController;
 import my_project.model.KnebiParser;
+import my_project.model.LJParser;
+import my_project.model.LJParserProVersion;
 import my_project.view.MainGUI;
 
 import java.awt.event.MouseEvent;
@@ -18,6 +20,8 @@ public class ProgramController {
     // Referenzen
     private ViewController viewController;  // diese Referenz soll auf ein Objekt der Klasse viewController zeigen. Über dieses Objekt wird das Fenster gesteuert.
     private KnebiParser knebiParser;
+    private LJParser lJParser;
+    private LJParserProVersion lJParserProVersion;
 
     /**
      * Konstruktor
@@ -39,6 +43,8 @@ public class ProgramController {
         viewController.getSoundController().loadSound("assets/yesyesyes.mp3","yes",false);
         viewController.getSoundController().loadSound("assets/nonono.mp3","no",false);
         knebiParser = new KnebiParser();
+        lJParser = new LJParser();
+        lJParserProVersion = new LJParserProVersion();
         // todo Eigener Code
 
 
@@ -54,9 +60,13 @@ public class ProgramController {
         switch(parserIndex){
             case 0:
                 return knebiParser.parse(input);
+
             // todo Hier können weitere Parser aufgeführt werden
             case 1:
-                return knebiParser.parse(input);
+                return lJParser.parse(input);
+
+            case 2:
+                return lJParserProVersion.parse(input);
 
             default: System.out.println("\nDebug-Info: Für diesen Index ist kein Parser definiert!");
         }
@@ -77,7 +87,10 @@ public class ProgramController {
                 return result;
             // todo Hier können weitere Scanner aufgeführt werden.
             case 1:
-                return knebiParser.getScannerResult(input);
+                return lJParser.getScannerResult(input);
+
+            case 2:
+                return lJParserProVersion.getScannerResult(input);
 
             default: System.out.println("\nDebug-Info: Für diesen Index ist kein Scanner definiert!");
         }
