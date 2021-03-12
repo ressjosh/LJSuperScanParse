@@ -36,7 +36,9 @@
         <children>
           <component id="19c78" class="javax.swing.JTextArea" binding="input">
             <constraints/>
-            <properties/>
+            <properties>
+              <text value="start "/>
+            </properties>
           </component>
         </children>
       </scrollpane>

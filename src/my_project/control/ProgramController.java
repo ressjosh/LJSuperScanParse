@@ -19,8 +19,6 @@ public class ProgramController {
 
     // Referenzen
     private ViewController viewController;  // diese Referenz soll auf ein Objekt der Klasse viewController zeigen. Über dieses Objekt wird das Fenster gesteuert.
-    private Ausgabefeld ausgabe;
-    private Eingabefeld eingabe;
     private CentralControll cC;
 
     /**
@@ -38,13 +36,10 @@ public class ProgramController {
      * Diese Methode wird genau ein mal nach Programmstart aufgerufen. Achtung: funktioniert nicht im Szenario-Modus
      */
     public void startProgram() {
-        cC = new CentralControll();
+        cC = new CentralControll(viewController);
         viewController.getDrawFrame().setSize(530,260);
-        eingabe = new Eingabefeld(this, cC);
         viewController.getSoundController().loadSound("assets/yesyesyes.mp3","yes",false);
         viewController.getSoundController().loadSound("assets/nonono.mp3","no",false);
-        ausgabe = new Ausgabefeld();
-        viewController.draw(ausgabe);
 
     }
 
