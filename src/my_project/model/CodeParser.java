@@ -4,7 +4,8 @@ public class CodeParser implements Parser {
 
     private CodeScanner scanner;
 
-    public CodeParser(){
+    public CodeParser(CodeScanner scan){
+        scanner = scan;
 
     }
 
@@ -12,8 +13,11 @@ public class CodeParser implements Parser {
     /**
      * Diese Methode parst eine Eingabe und stellt fest, ob sie zur Sprache L_Knebi = k(ne)*bi gehört
      */
-    public boolean parse(String input) {
+    public boolean parse() {
+        scanner.tokenList.toFirst();
+        if(scanner.getType().equals("start")){
 
+        }
         return false;
     }
 
