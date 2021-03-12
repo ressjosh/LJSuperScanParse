@@ -25,20 +25,26 @@ public class CodeScanner extends Scanner<String,String> {
         for (int i = 0; i < input.length(); i++) {
             if (i+4 < input.length() && (input.substring(i, i+5)).equals("start")) {
                 System.out.println("Hey");
+                this.tokenList.append(new Token("start","Start"));
             }else
             if (i+3 < input.length() && (input.substring(i, i+4)).equals("ende")) {
                 System.out.println("Hey");
+                this.tokenList.append(new Token("ende","Ende"));
             }else
             if (i+6 < input.length() && (input.substring(i, i+7)).equals("befehle")) {
+                this.tokenList.append(new Token("befehl","befehle"));
                 System.out.println("Hey");
             }else
             if (i+4 < input.length() && (input.substring(i, i+5)).equals("vor()")) {
                 System.out.println("Hey");
+                this.tokenList.append(new Token("vor","bewegung"));
             }else
             if (i+8 < input.length() && (input.substring(i, i+9)).equals("linksUm()")) {
+                this.tokenList.append(new Token("linksUm","bewegung"));
                 System.out.println("Hey");
             }else
             if (i+9 < input.length() && (input.substring(i, i+10)).equals("rechtsUm()")) {
+                this.tokenList.append(new Token("rechtsUm","bewegung"));
                 System.out.println("Hey");
             }else
             if (input.charAt(i) == 0) {
