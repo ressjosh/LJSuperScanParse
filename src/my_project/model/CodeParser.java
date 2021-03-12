@@ -1,11 +1,11 @@
 package my_project.model;
 
-public class KnebiParser implements Parser {
+public class CodeParser implements Parser {
 
-    private KnebiScanner scanner;
+    private CodeScanner scanner;
 
-    public KnebiParser(){
-        scanner = new KnebiScanner();
+    public CodeParser(){
+
     }
 
     @Override
@@ -13,19 +13,7 @@ public class KnebiParser implements Parser {
      * Diese Methode parst eine Eingabe und stellt fest, ob sie zur Sprache L_Knebi = k(ne)*bi gehört
      */
     public boolean parse(String input) {
-        if(scanner.scan(input)) {
-            if (scanner.getType().equals("START")) {
-                scanner.nextToken();
-                if (scanner.getType().equals("MIDDLE")) {
-                    scanner.nextToken();
-                    while (scanner.getType().equals("MIDDLE")) scanner.nextToken();
-                    if (scanner.getType().equals("END")) {
-                        scanner.nextToken();
-                        if (scanner.getType().equals("NODATA")) return true;
-                    }
-                }
-            }
-        }
+
         return false;
     }
 
@@ -78,9 +66,4 @@ public class KnebiParser implements Parser {
     }
 
     //************** Ausgabe der Scanner-Analyse zur Nachvollziehbarkeit *********
-
-    public String getScannerOutput(){
-        return scanner.getDebugOutput();
-    }
-
 }

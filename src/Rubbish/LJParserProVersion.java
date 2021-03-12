@@ -1,4 +1,4 @@
-package my_project.model;
+package Rubbish;
 
 public class LJParserProVersion {
 

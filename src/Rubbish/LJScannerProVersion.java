@@ -1,6 +1,7 @@
-package my_project.model;
+package Rubbish;
 
 import KAGO_framework.model.abitur.datenstrukturen.List;
+import my_project.model.Scanner;
 
 public class LJScannerProVersion extends Scanner<String,String> {
 

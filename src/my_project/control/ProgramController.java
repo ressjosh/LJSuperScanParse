@@ -1,10 +1,10 @@
 package my_project.control;
 
 import KAGO_framework.control.ViewController;
-import my_project.model.KnebiParser;
-import my_project.model.LJParser;
-import my_project.model.LJParserProVersion;
-import my_project.view.MainGUI;
+import my_project.model.CodeParser;
+import Rubbish.LJParser;
+import my_project.view.Ausgabefeld;
+import my_project.view.Eingabefeld;
 
 import java.awt.event.MouseEvent;
 
@@ -19,9 +19,9 @@ public class ProgramController {
 
     // Referenzen
     private ViewController viewController;  // diese Referenz soll auf ein Objekt der Klasse viewController zeigen. Über dieses Objekt wird das Fenster gesteuert.
-    private KnebiParser knebiParser;
-    private LJParser lJParser;
-    private LJParserProVersion lJParserProVersion;
+    private Ausgabefeld ausgabe;
+    private Eingabefeld eingabe;
+    private CentralControll cC;
 
     /**
      * Konstruktor
@@ -38,25 +38,20 @@ public class ProgramController {
      * Diese Methode wird genau ein mal nach Programmstart aufgerufen. Achtung: funktioniert nicht im Szenario-Modus
      */
     public void startProgram() {
-        viewController.getDrawFrame().setSize(600,320);
-        viewController.getDrawFrame().setContentPane(new MainGUI(this).getMainPanel());
+        cC = new CentralControll();
+        viewController.getDrawFrame().setSize(530,260);
+        eingabe = new Eingabefeld(this, cC);
         viewController.getSoundController().loadSound("assets/yesyesyes.mp3","yes",false);
         viewController.getSoundController().loadSound("assets/nonono.mp3","no",false);
-        knebiParser = new KnebiParser();
-        lJParser = new LJParser();
-        lJParserProVersion = new LJParserProVersion();
-        // todo Eigener Code
-
+        ausgabe = new Ausgabefeld();
+        viewController.draw(ausgabe);
 
     }
 
     /**
-     * Diese Methode parst den übergebenen String mit einem Parser einer Sprache.
-     * @param input der zu parsende String
-     * @param parserIndex der Index des zu verwendenden Parsers (0 = Knebiparser, Rest ist frei)
-     * @return true, fallse der String ein Wort der Sprache des Parsers ist.
+     *ring ein Wort der Sprache des Parsers ist.
      */
-    public boolean parseString(String input, int parserIndex){
+   /* public boolean parseString(String input, int parserIndex){
         switch(parserIndex){
             case 0:
                 return knebiParser.parse(input);
@@ -79,7 +74,7 @@ public class ProgramController {
      * @param parserIndex der zu verwendende Scanner (ist dem Parser zugeordnet, daher Parserindex)
      * @return true, falls der Scan erfolgreich war, andernfalls false
      */
-    public boolean scanString(String input, int parserIndex){
+    /*public boolean scanString(String input, int parserIndex){
         switch(parserIndex){
             case 0:
                 boolean result = knebiParser.getScannerResult(input);
@@ -118,11 +113,11 @@ public class ProgramController {
 
     }
 
-    public void playYes(){
+    /*public void playYes(){
         viewController.getSoundController().playSound("yes");
     }
 
     public void playNo(){
         viewController.getSoundController().playSound("no");
-    }
+    }*/
 }
