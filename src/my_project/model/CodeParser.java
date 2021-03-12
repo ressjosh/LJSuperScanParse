@@ -16,7 +16,19 @@ public class CodeParser implements Parser {
     public boolean parse() {
         scanner.tokenList.toFirst();
         if(scanner.getType().equals("start")){
-
+            scanner.nextToken();
+            if(scanner.getType().equals("befehl")) {
+                scanner.nextToken();
+                while (scanner.getType().equals("bewegung")) {
+                    scanner.nextToken();
+                }
+                if(scanner.getType().equals("ende")){
+                    scanner.nextToken();
+                    if(scanner.getType().equals("NODATA")) {
+                        return true;
+                    }
+                }
+            }
         }
         return false;
     }
