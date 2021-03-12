@@ -20,4 +20,8 @@ public class Interpreter {
 
     }
 
+    public void start(){
+        System.out.println("Interpretieren startet jetzt");
+    }
+
 }

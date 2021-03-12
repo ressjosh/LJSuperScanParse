@@ -52,18 +52,17 @@ public class CodeScanner extends Scanner<String,String> {
         return true;
     }
 
-    private void scanneCode(){
-        boolean fehlergefunden = false;
+    private boolean scanneCode(){
         if(scan(aktuelleBefehleString)){
-            parser.parse();
-        }else fehlergefunden = true;
-        System.out.println("Scan ist" + scan(aktuelleBefehleString));
+            System.out.println("Hey");
+            return parser.parse();
+        }else return false;
     }
 
-    public void ankommendesStringAbarbeiten(String code){
+    public boolean ankommendesStringAbarbeiten(String code){
         aktuelleBefehleString = leifereEinzelneZeilen(code);
         aktuelleBefehleString = aktuelleBefehleString.replaceAll("\n", " ");
-        scanneCode();
+        return scanneCode();
     }
 
     private String leifereEinzelneZeilen(String code){
