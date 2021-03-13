@@ -61,14 +61,24 @@ public class CodeScanner extends Scanner<String,String> {
                 this.tokenList.append(new Token(input.substring(i+8, i+laenge),"methodenkopf"));
                 if(!scanneUndParseMethodenRumpf(i+laenge+1, input.substring(i+8, i+laenge))) return false;
                 i = i+7;
-                while(aktuelleBefehleString.charAt(i) != '#') i++;
+                int anzahlRauten = 1;
+                while(anzahlRauten!= 0){
+                    if (i+3 < input.length() && (input.substring(i, i+4)).equals("wenn")){
+                        System.out.println("Raute hinzugefügt");
+                        anzahlRauten++;
+                    }else if(input.charAt(i) == '#'){
+                        System.out.println("Raute entfernt");
+                        anzahlRauten--;
+                    }
+                    i++;
+                }
             }else if (i+6 < input.length() && (input.substring(i, i+7)).equals("process")) {
                 int laenge = ermitteleMethodenkopf(i);
                 this.tokenList.append(new Token(input.substring(i+8, i+laenge),"methodenaufruf"));
                 i = i+laenge;
             }else if (i+3 < input.length() && (input.substring(i, i+4)).equals("wenn")) {
                 this.tokenList.append(new Token(""+i,"verzweigung"));
-                if(!scanneUndParseBedingung(i+3, i)) return false;
+                if(!scanneUndParseBedingung(i+3, i, null)) return false;
                 while(aktuelleBefehleString.charAt(i) != '#') i++;
             }else if (input.charAt(i) == ' ') {
 
@@ -116,33 +126,41 @@ public class CodeScanner extends Scanner<String,String> {
     }
 
     private boolean scanneUndParseMethodenRumpf(int i, String methodenname){
-        String input = aktuelleBefehleString;
         Methode newMethod = new Methode(methodenname);
         methodenliste.append(newMethod);
+        return scanneMethode(i, newMethod);
+    }
+    private boolean scanneMethode(int i, Methode newMethod){
+        String input = aktuelleBefehleString;
         int j = i;
         while (input.charAt(j) != '#' && j < input.length()) {
-           if (j+4 < input.length() && (input.substring(j, j+5)).equals("vor()")) {
-               j = j+4;
-                newMethod.weitererBefehl("vor");
+            if (j+4 < input.length() && (input.substring(j, j+5)).equals("vor()")) {
+                j = j+4;
+                newMethod.tokenList.append(new Token("vor","bewegung"));
             }else if (j+8 < input.length() && (input.substring(j, j+9)).equals("linksUm()")) {
-               j = j+8;
-               newMethod.weitererBefehl("linksUm");
+                j = j+8;
+                newMethod.tokenList.append(new Token("linksUm","bewegung"));
             }else if (j+9 < input.length() && (input.substring(j, j+10)).equals("rechtsUm()")) {
-               j = j+9;
-               newMethod.weitererBefehl("rechtsUm");
+                j = j+9;
+                newMethod.tokenList.append(new Token("rechtsUm","bewegung"));
             }else if (j+9 < input.length() && (input.substring(j, j+10)).equals("pflanzen()")) {
-               j = j+9;
-               newMethod.weitererBefehl("pflanzen");
+                j = j+9;
+                newMethod.tokenList.append(new Token("pflanzen","baum"));
             }else if (j+7 < input.length() && (input.substring(j, j+8)).equals("ernten()")) {
-               j = j+7;
-               newMethod.weitererBefehl("ernten");
+                j = j+7;
+                newMethod.tokenList.append(new Token("ernten","baum"));
             }else if (j+6 < input.length() && (input.substring(j, j+7)).equals("process")) {
-               int laenge = ermitteleMethodenkopf(j);
-               newMethod.weitererBefehl(input.substring(j+8, j+laenge));
-               j = j+laenge;
-           }else if (input.charAt(j) == ' ') {
+                int laenge = ermitteleMethodenkopf(j);
+                newMethod.tokenList.append(new Token(input.substring(j+8, j+laenge),"methodenaufruf"));
+                j = j+laenge;
+            }else if (j+3 < input.length() && (input.substring(j, j+4)).equals("wenn")) {
+                newMethod.tokenList.append(new Token(""+j,"verzweigung"));
+                if(!scanneUndParseBedingung(i+3, i, newMethod)) return false;
+                while(aktuelleBefehleString.charAt(j) != '#') j++;
 
-           }else return false;
+            }else if (input.charAt(j) == ' ') {
+
+            }else return false;
             j++;
         }
         if(input.length() <= j) return false;
@@ -172,16 +190,16 @@ public class CodeScanner extends Scanner<String,String> {
         return verzweigungen.getContent();
     }
 
-    private boolean scanneUndParseBedingung(int i, int bedingugnsIndex){
+    private boolean scanneUndParseBedingung(int i, int bedingugnsIndex, Methode innerhalbMethode){
         String input = aktuelleBefehleString;
         int tmp = i+1;
         while (aktuelleBefehleString.charAt(tmp) == ' ') {
             tmp = tmp + 1;
         }
         if(tmp+7 < input.length() && (input.substring(tmp, tmp+8)).equals("nussHier")){
-            return scanneUndParseVerzweigung("nussHier", bedingugnsIndex);
+            return scanneUndParseVerzweigung("nussHier", bedingugnsIndex, innerhalbMethode);
         }else if(tmp+11 < input.length() && (input.substring(tmp, tmp+12)).equals("wandVoraus")){
-            return scanneUndParseVerzweigung("wandVoraus", bedingugnsIndex);
+            return scanneUndParseVerzweigung("wandVoraus", bedingugnsIndex, innerhalbMethode);
         }else{
             int beginn = tmp;
             int ende = 0;
@@ -195,17 +213,35 @@ public class CodeScanner extends Scanner<String,String> {
             if(operator == null) return false;
             String[] werte = bedingung.split(operator);
             if(ausZahlen(werte[0]) && ausZahlen(werte[1])){
-                return scanneUndParseVerzweigung(bedingung, bedingugnsIndex);
+                return scanneUndParseVerzweigung(bedingung, bedingugnsIndex, innerhalbMethode);
             }else return false;
         }
     }
 
-    private boolean scanneUndParseVerzweigung(String bedingung, int bedingungsIndex){
-        int tmp = bedingungsIndex;
-        while(aktuelleBefehleString.charAt(tmp) != '#') tmp++;
-        int anzahlbefehle = ermitteleAnzahlBefehle(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
+    private boolean scanneUndParseVerzweigung(String bedingung, int bedingungsIndex, Methode innerhalbMethode){
+        int tmp = bedingungsIndex+5 + bedingung.length();
+        String input = aktuelleBefehleString;
+
+        //TODO If-Verzweigung in If-Verzweigung testen, Grundlage ist hier geschaffen.
+        int anzahlRauten = 1;
+        while(anzahlRauten!= 0){
+            if (tmp+3 < input.length() && (input.substring(tmp, tmp+4)).equals("wenn")){
+                System.out.println("Raute hinzugefügt");
+                anzahlRauten++;
+            }else if(input.charAt(tmp) == '#'){
+                System.out.println("Raute entfernt");
+                anzahlRauten--;
+            }
+            tmp++;
+        }
+        System.out.println(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
+        int anzahlbefehle = ermitteleAnzahlBefehle(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
         verzweigungen.append(new Verzweigung(this, bedingung, anzahlbefehle, bedingungsIndex, vC));
-        return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
+        if(innerhalbMethode == null){
+            return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
+        }else{
+            return scanneMethode(bedingungsIndex+5 + bedingung.length(), innerhalbMethode);
+        }
     }
 
     public boolean ausZahlen(String potentielleZahl){
@@ -249,6 +285,7 @@ public class CodeScanner extends Scanner<String,String> {
     }
 
     private int ermitteleAnzahlBefehle(String s){
+        //TODO Methodenaufrufe integrieren
         String[] befehlfolge = s.trim().split(" ");
         int anzahlBefehle = befehlfolge.length;
         return anzahlBefehle;

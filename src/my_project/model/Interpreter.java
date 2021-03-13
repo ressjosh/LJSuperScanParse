@@ -55,7 +55,7 @@ public class Interpreter extends GraphicalObject {
                 } else if (scanner.getType().equals("baum")) {
                     arbeiteAnBaum();
                 } else if (scanner.getType().equals("methodenaufruf")) {
-                    bearbeiteMethode(scanner.getThis(scanner.getValue()).getCommands());
+                    bearbeiteMethode(scanner.getThis(scanner.getValue()));
                 }else if (scanner.getType().equals("verzweigung")) {
                     bearbeiteVerzweigung();
                 }
@@ -105,27 +105,27 @@ public class Interpreter extends GraphicalObject {
         }
     }
 
-    private void bearbeiteMethode(List<String> methodeninhalt){
-        List<String> commands = methodeninhalt;
-        commands.toFirst();
-        while(commands.hasAccess()) {
-            System.out.println(commands.getContent());
-            if (commands.getContent().equals("vor")) {
+    private void bearbeiteMethode(Methode methode){
+        methode.tokenList.toFirst();
+        while(methode.tokenList.hasAccess()) {
+            if (methode.getValue().equals("vor")) {
                 geheVor();
-            } else if (commands.getContent().equals("rechtsUm")) {
+            } else if (methode.getValue().equals("rechtsUm")) {
                 vC.getBiber().setRichtung(1);
-            } else if (commands.getContent().equals("linksUm")) {
+            } else if (methode.getValue().equals("linksUm")) {
                 vC.getBiber().setRichtung(-1);
-            } else if (commands.getContent().equals("pflanzen")) {
+            } else if (methode.getValue().equals("pflanzen")) {
                 vC.getAktuellesFeld().erhoeheBaumAnzahl(1);
-            } else if (commands.getContent().equals("ernten")) {
+            } else if (methode.getValue().equals("ernten")) {
                 if(vC.getAktuellesFeld().getBaumAnzahl() > 0 ){
                     vC.getAktuellesFeld().setBaumAnzahl(-1);
                 }else JOptionPane.showMessageDialog(null, "Hier ist nichts zum ernten");
-            }else{
-                bearbeiteMethode(scanner.getThis(commands.getContent()).getCommands());
+            }else if(methode.getType().equals("methodenaufruf")){
+                bearbeiteMethode(scanner.getThis(methode.getValue()));
+            }else if (methode.getType().equals("verzweigung")) {
+                bearbeiteVerzweigungInMethode(methode);
             }
-            commands.next();
+            methode.nextToken();
         }
     }
 
@@ -154,6 +154,14 @@ public class Interpreter extends GraphicalObject {
         if(!diese.bedingungpruefen()){
             for(int i = 0; i < diese.anzahlbefehle(); i++){
                 scanner.nextToken();
+            }
+        }
+    }
+    private void bearbeiteVerzweigungInMethode(Methode methode){
+        Verzweigung diese = scanner.getVerzweigungsInfo(Integer.parseInt(methode.getValue()));
+        if(!diese.bedingungpruefen()){
+            for(int i = 0; i < diese.anzahlbefehle(); i++){
+                methode.nextToken();
             }
         }
     }
