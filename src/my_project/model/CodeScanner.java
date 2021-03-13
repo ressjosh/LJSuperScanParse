@@ -42,6 +42,12 @@ public class CodeScanner extends Scanner<String,String> {
             }else if (i+9 < input.length() && (input.substring(i, i+10)).equals("rechtsUm()")) {
                 this.tokenList.append(new Token("rechtsUm","bewegung"));
                 i = i+9;
+            }else if (i+9 < input.length() && (input.substring(i, i+10)).equals("pflanzen()")) {
+                this.tokenList.append(new Token("pflanzen","baum"));
+                i = i+9;
+            }else if (i+7 < input.length() && (input.substring(i, i+8)).equals("ernten()")) {
+                this.tokenList.append(new Token("ernten","baum"));
+                i = i+7;
             }else if (input.charAt(i) == ' ') {
 
             }else return false;

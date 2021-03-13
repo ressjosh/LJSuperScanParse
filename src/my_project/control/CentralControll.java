@@ -17,13 +17,17 @@ public class CentralControll {
         this.vC = vC;
         viewControll = new ViewControll(this, vC);
         scanner = new CodeScanner();
-        interpreter = new Interpreter();
+        interpreter = new Interpreter(this, viewControll);
     }
 
 
     public void executeCode(String code){
         if(scanner.ankommendesStringAbarbeiten(code)){
-            interpreter.start();
+            interpreter.start(scanner);
         }else viewControll.showError();
+    }
+
+    public Interpreter getInterpreter() {
+        return interpreter;
     }
 }

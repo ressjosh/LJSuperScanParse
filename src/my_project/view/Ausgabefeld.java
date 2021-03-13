@@ -22,13 +22,14 @@ public class Ausgabefeld extends GraphicalObject {
 
     @Override
     public void draw(DrawTool drawTool) {
-        drawTool.drawRectangle(9, 9, 401, 201);
+        drawTool.drawRectangle(9, 9, 501, 251);
+        drawTool.drawRectangle(8, 8, 503, 253);
         for(int i = 0; i <10; i++){
             for(int j = 0; j < 5; j++){
-                drawTool.drawImage(myImage, 10+i*40, 10+j*40);
+                drawTool.drawImage(vC.getFelder()[i][j].getImage(), 10+i*50, 10+j*50);
             }
         }
-        drawTool.drawImage(biber, 10 + vC.getBiber().getWeite()*40, 10 + vC.getBiber().getHoehe()*40);
+        drawTool.drawImage(vC.getBiber().myImage(), 10 + vC.getBiber().getWeite()*50, 10 + vC.getBiber().getHoehe()*50);
 
     }
 }

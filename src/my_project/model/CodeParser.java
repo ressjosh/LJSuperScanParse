@@ -19,7 +19,7 @@ public class CodeParser implements Parser {
             scanner.nextToken();
             if(scanner.getType().equals("befehle")) {
                 scanner.nextToken();
-                while (scanner.getType().equals("bewegung")) {
+                while (scanner.getType().equals("bewegung") || scanner.getType().equals("baum")) {
                     scanner.nextToken();
                 }
                 if(scanner.getType().equals("ende")){
