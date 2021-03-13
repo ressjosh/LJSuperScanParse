@@ -139,9 +139,8 @@ public class CodeScanner extends Scanner<String,String> {
 
     public Methode getThis(String methode){
         methodenliste.toFirst();
-        System.out.println("Methode wurde erstellt! :" + methode + ":");
-        System.out.println("Methode wurde erstellt! :" + methodenliste.getContent().getName() + ":");
-        while(methodenliste.hasAccess() && methodenliste.getContent().getName() == methode){
+        System.out.println("Methode ist gesucht:" + methode + ":");
+        while(methodenliste.hasAccess() && !methodenliste.getContent().getName().equals(methode) ){
             System.out.println("Methode wurde erstellt! :" + methode + ":");
             System.out.println("Methode wurde erstellt! :" + methodenliste.getContent().getName() + ":");
             methodenliste.next();
