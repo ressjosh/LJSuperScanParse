@@ -46,12 +46,15 @@ public class Interpreter extends GraphicalObject {
                 scanner.nextToken();
         }
     }
+
     private void interpret02(){
         if(!scanner.getType().equals("NODATA")) {
             if (scanner.getType().equals("bewegung")) {
                 fuehreBewegungAus();
             } else if (scanner.getType().equals("baum")) {
                 arbeiteAnBaum();
+            }else if (scanner.getType().equals("methodenaufruf")) {
+                bearbeiteMethode();
             }
             scanner.nextToken();
             timer = 2;
@@ -76,24 +79,7 @@ public class Interpreter extends GraphicalObject {
 
     private void fuehreBewegungAus(){
         if(scanner.getValue().equals("vor")){
-
-            if(vC.getBiber().getRichtung() == 0){
-                if(vC.getBiber().getWeite() < 9){
-                    vC.getBiber().setWeite(vC.getBiber().getWeite()+1);
-                }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
-            }else if(vC.getBiber().getRichtung() == 1){
-                if(vC.getBiber().getHoehe() < 5){
-                    vC.getBiber().setHoehe(vC.getBiber().getHoehe()+1);
-                }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
-            }else if(vC.getBiber().getRichtung() == 2){
-                if(vC.getBiber().getWeite() > 0){
-                    vC.getBiber().setWeite(vC.getBiber().getWeite()-1);
-                }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
-            }else if(vC.getBiber().getRichtung() == 3){
-                if(vC.getBiber().getHoehe() >0){
-                    vC.getBiber().setHoehe(vC.getBiber().getHoehe()-1);
-                }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
-            }
+            geheVor();
         }else if(scanner.getValue().equals("rechtsUm")){
             vC.getBiber().setRichtung(1);
 
@@ -111,5 +97,48 @@ public class Interpreter extends GraphicalObject {
             }else JOptionPane.showMessageDialog(null, "Hier ist nichts zum ernten");
         }
     }
+
+    private void bearbeiteMethode(){
+        List<String> commands = scanner.getThis(scanner.getValue()).getCommands();
+        commands.toFirst();
+        while(commands.hasAccess()) {
+            System.out.println(commands.getContent());
+            if (commands.getContent().equals("vor")) {
+                geheVor();
+            } else if (commands.getContent().equals("rechtsUm")) {
+                vC.getBiber().setRichtung(1);
+            } else if (commands.getContent().equals("linksUm")) {
+                vC.getBiber().setRichtung(-1);
+            } else if (commands.getContent().equals("pflanzen")) {
+                vC.getAktuellesFeld().erhoeheBaumAnzahl(1);
+            } else if (commands.getContent().equals("ernten")) {
+                if(vC.getAktuellesFeld().getBaumAnzahl() > 0 ){
+                    vC.getAktuellesFeld().setBaumAnzahl(-1);
+                }else JOptionPane.showMessageDialog(null, "Hier ist nichts zum ernten");
+            }
+            commands.next();
+        }
+    }
+
+    private void geheVor(){
+        if(vC.getBiber().getRichtung() == 0){
+            if(vC.getBiber().getWeite() < 9){
+                vC.getBiber().setWeite(vC.getBiber().getWeite()+1);
+            }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
+        }else if(vC.getBiber().getRichtung() == 1){
+            if(vC.getBiber().getHoehe() < 5){
+                vC.getBiber().setHoehe(vC.getBiber().getHoehe()+1);
+            }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
+        }else if(vC.getBiber().getRichtung() == 2){
+            if(vC.getBiber().getWeite() > 0){
+                vC.getBiber().setWeite(vC.getBiber().getWeite()-1);
+            }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
+        }else if(vC.getBiber().getRichtung() == 3){
+            if(vC.getBiber().getHoehe() >0){
+                vC.getBiber().setHoehe(vC.getBiber().getHoehe()-1);
+            }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
+        }
+    }
+
 
 }

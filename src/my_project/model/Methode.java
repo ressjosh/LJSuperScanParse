@@ -26,4 +26,12 @@ public class Methode {
     public void nextCommand(){
         commands.next();
     }
+
+    public List<String> getCommands(){
+        return commands;
+    }
+
+    public String getName(){
+        return methodenname;
+    }
 }

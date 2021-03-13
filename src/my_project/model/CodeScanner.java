@@ -56,6 +56,10 @@ public class CodeScanner extends Scanner<String,String> {
                 if(!scanneUndParseMethodenRumpf(i+laenge+1, input.substring(i+8, i+laenge))) return false;
                 i = i+7;
                 while(aktuelleBefehleString.charAt(i) != '#') i++;
+            }else if (i+6 < input.length() && (input.substring(i, i+7)).equals("process")) {
+                int laenge = ermitteleMethodenkopf(i);
+                this.tokenList.append(new Token(input.substring(i+8, i+laenge),"methodenaufruf"));
+                i = i+laenge;
             }else if (input.charAt(i) == ' ') {
 
             }else return false;
@@ -68,7 +72,6 @@ public class CodeScanner extends Scanner<String,String> {
 
     private boolean scanneCode(){
         if(scan(aktuelleBefehleString)){
-            System.out.println("Hey");
             return parser.parse();
         }else return false;
     }
@@ -123,11 +126,27 @@ public class CodeScanner extends Scanner<String,String> {
                newMethod.weitererBefehl("ernten");
             }else if (input.charAt(j) == ' ') {
 
-            }else System.out.println("Die Rückgabe ist false");
+            }else return false;
             j++;
         }
-        System.out.println("Die Rückgabe ist true");
         if(input.length() <= j) return false;
         return true;
+    }
+
+    public List<Methode> getMethodenliste(){
+        return methodenliste;
+    }
+
+    public Methode getThis(String methode){
+        methodenliste.toFirst();
+        System.out.println("Methode wurde erstellt! :" + methode + ":");
+        System.out.println("Methode wurde erstellt! :" + methodenliste.getContent().getName() + ":");
+        while(methodenliste.hasAccess() && methodenliste.getContent().getName() == methode){
+            System.out.println("Methode wurde erstellt! :" + methode + ":");
+            System.out.println("Methode wurde erstellt! :" + methodenliste.getContent().getName() + ":");
+            methodenliste.next();
+        }
+        System.out.println("Methode wurde erstellt! :" + methodenliste.getContent() + ":");
+        return methodenliste.getContent();
     }
 }
