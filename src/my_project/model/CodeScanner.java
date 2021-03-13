@@ -11,9 +11,11 @@ public class CodeScanner extends Scanner<String,String> {
     private String[] aktuelleBefehle;
     private String aktuelleBefehleString;
     private CodeParser parser;
+    private List<Methode> methodenliste;
 
     public CodeScanner() {
         parser = new CodeParser(this);
+        methodenliste = new List<>();
     }
 
     @Override
@@ -21,7 +23,7 @@ public class CodeScanner extends Scanner<String,String> {
         if (input == null || input.length() == 0) {
             return false;
         }
-
+        methodenliste = new List<>();
         this.tokenList = new List();
         for (int i = 0; i < input.length(); i++) {
             if (i+4 < input.length() && (input.substring(i, i+5)).equals("start")) {
@@ -48,6 +50,12 @@ public class CodeScanner extends Scanner<String,String> {
             }else if (i+7 < input.length() && (input.substring(i, i+8)).equals("ernten()")) {
                 this.tokenList.append(new Token("ernten","baum"));
                 i = i+7;
+            }else if (i+6 < input.length() && (input.substring(i, i+7)).equals("methode")) {
+                int laenge = ermitteleMethodenkopf(i);
+                this.tokenList.append(new Token(input.substring(i+8, i+laenge),"methodenkopf"));
+                if(!scanneUndParseMethodenRumpf(i+laenge+1, input.substring(i+8, i+laenge))) return false;
+                i = i+7;
+                while(aktuelleBefehleString.charAt(i) != '#') i++;
             }else if (input.charAt(i) == ' ') {
 
             }else return false;
@@ -79,5 +87,47 @@ public class CodeScanner extends Scanner<String,String> {
         }
         System.out.println(aktuelleBefehle.length);
         return tmp;
+    }
+
+    private int ermitteleMethodenkopf(int i){
+        int tmp = 7;
+        while(aktuelleBefehleString.charAt(i+tmp) == ' '){
+            tmp = tmp +1;
+        }
+        while(aktuelleBefehleString.charAt(i+tmp) != ' '){
+            tmp = tmp +1;
+        }
+        return tmp;
+    }
+
+    private boolean scanneUndParseMethodenRumpf(int i, String methodenname){
+        String input = aktuelleBefehleString;
+        Methode newMethod = new Methode(methodenname);
+        methodenliste.append(newMethod);
+        int j = i;
+        while (input.charAt(j) != '#' && j < input.length()) {
+           if (j+4 < input.length() && (input.substring(j, j+5)).equals("vor()")) {
+               j = j+4;
+                newMethod.weitererBefehl("vor");
+            }else if (j+8 < input.length() && (input.substring(j, j+9)).equals("linksUm()")) {
+               j = j+8;
+               newMethod.weitererBefehl("linksUm");
+            }else if (j+9 < input.length() && (input.substring(j, j+10)).equals("rechtsUm()")) {
+               j = j+9;
+               newMethod.weitererBefehl("rechtsUm");
+            }else if (j+9 < input.length() && (input.substring(j, j+10)).equals("pflanzen()")) {
+               j = j+9;
+               newMethod.weitererBefehl("pflanzen");
+            }else if (j+7 < input.length() && (input.substring(j, j+8)).equals("ernten()")) {
+               j = j+7;
+               newMethod.weitererBefehl("ernten");
+            }else if (input.charAt(j) == ' ') {
+
+            }else System.out.println("Die Rückgabe ist false");
+            j++;
+        }
+        System.out.println("Die Rückgabe ist true");
+        if(input.length() <= j) return false;
+        return true;
     }
 }

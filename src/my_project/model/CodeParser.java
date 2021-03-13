@@ -17,6 +17,9 @@ public class CodeParser implements Parser {
         scanner.tokenList.toFirst();
         if(scanner.getType().equals("start")){
             scanner.nextToken();
+            while(scanner.getType().equals("methodenkopf")){
+                scanner.nextToken();
+            }
             if(scanner.getType().equals("befehle")) {
                 scanner.nextToken();
                 while (scanner.getType().equals("bewegung") || scanner.getType().equals("baum")) {
