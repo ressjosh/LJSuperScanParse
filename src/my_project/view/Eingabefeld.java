@@ -36,6 +36,7 @@ public class Eingabefeld {
         fenster.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         fenster.pack();
         fenster.setVisible(true);
+        fenster.setBounds(40,40,250,900);
 
         executeButton.addActionListener(new ActionListener() {
             @Override

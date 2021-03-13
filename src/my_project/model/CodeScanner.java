@@ -2,6 +2,9 @@ package my_project.model;
 
 import KAGO_framework.model.abitur.datenstrukturen.List;
 
+import javax.swing.*;
+import javax.xml.stream.events.Characters;
+
 /**
  * Diese Klasse scannt Strings für die Sprache L_Knebi = k(ne)*bi
  */
@@ -23,8 +26,6 @@ public class CodeScanner extends Scanner<String,String> {
         if (input == null || input.length() == 0) {
             return false;
         }
-        methodenliste = new List<>();
-        this.tokenList = new List();
         for (int i = 0; i < input.length(); i++) {
             if (i+4 < input.length() && (input.substring(i, i+5)).equals("start")) {
                 i = i+4;
@@ -71,6 +72,8 @@ public class CodeScanner extends Scanner<String,String> {
     }
 
     private boolean scanneCode(){
+        methodenliste = new List<>();
+        this.tokenList = new List();
         if(scan(aktuelleBefehleString)){
             return parser.parse();
         }else return false;
@@ -124,9 +127,13 @@ public class CodeScanner extends Scanner<String,String> {
             }else if (j+7 < input.length() && (input.substring(j, j+8)).equals("ernten()")) {
                j = j+7;
                newMethod.weitererBefehl("ernten");
-            }else if (input.charAt(j) == ' ') {
+            }else if (j+6 < input.length() && (input.substring(j, j+7)).equals("process")) {
+               int laenge = ermitteleMethodenkopf(j);
+               newMethod.weitererBefehl(input.substring(j+8, j+laenge));
+               j = j+laenge;
+           }else if (input.charAt(j) == ' ') {
 
-            }else return false;
+           }else return false;
             j++;
         }
         if(input.length() <= j) return false;
@@ -139,9 +146,91 @@ public class CodeScanner extends Scanner<String,String> {
 
     public Methode getThis(String methode){
         methodenliste.toFirst();
+
         while(methodenliste.hasAccess() && !methodenliste.getContent().getName().equals(methode) ){
             methodenliste.next();
         }
+        if(methodenliste.getContent() == null)
+            JOptionPane.showMessageDialog(null, "Die Methode: " + methode + " existiert leider nicht, überprüfe die korrekte Schreibweise \n und versuche es erneut!");
         return methodenliste.getContent();
+    }
+
+    public Verzweigung getVerzweigungsInfo(int index){
+        return new Verzweigung(this, null, 0, 0);
+    }
+
+    private boolean scanneUndParseBedingung(int i, int bedingugnsIndex){
+        String input = aktuelleBefehleString;
+        int tmp = 1;
+        while (aktuelleBefehleString.charAt(i + tmp) == ' ') {
+            tmp = tmp + 1;
+        }
+        if(tmp+9 < input.length() && (input.substring(tmp, tmp+10)).equals("nussHier()")){
+            return scanneUndParseVerzweigung("nussHier", bedingugnsIndex);
+        }else if(tmp+11 < input.length() && (input.substring(tmp, tmp+12)).equals("wandVoraus()")){
+            return scanneUndParseVerzweigung("wandVoraus", bedingugnsIndex);
+        }else{
+            int beginn = tmp;
+            int ende = 0;
+            while (aktuelleBefehleString.charAt(i + tmp) != ' ') {
+                tmp = tmp + 1;
+            }
+            ende = tmp - 1;
+            char[] bedingungC = input.substring(beginn, ende+1).toCharArray();
+            String bedingung = input.substring(beginn, ende+1);
+            String operator = ermitteleOperator(bedingungC);
+            if(operator == null) return false;
+            String[] werte = bedingung.split(operator);
+            if(ausZahlen(werte[0]) && ausZahlen(werte[1])){
+                return scanneUndParseVerzweigung(bedingung, bedingugnsIndex);
+            }else return false;
+        }
+    }
+
+    private boolean scanneUndParseVerzweigung(String bedingung, int bedingugnsIndex){
+        int tmp = bedingugnsIndex;
+        while(aktuelleBefehleString.charAt(tmp) != '#') tmp++;
+        //scan(aktuelleBefehleString)
+        return false;
+    }
+
+    public boolean ausZahlen(String potentielleZahl){
+        if(potentielleZahl.equals("nussZahl") || potentielleZahl.equals("nusseGesammelt")) return true;
+
+        //Todo Bei Parametereinabreitung hier unbedingt neue Listenüberprüfung beifügen!
+
+        char[] tmp = potentielleZahl.toCharArray();
+        for(int i = 0; i < tmp.length; i++){
+            if(!Character.isDigit(tmp[i])) return false;
+        }
+        return true;
+    }
+
+    private String ermitteleOperator(char[] bedingung){
+        int gefundeneOperatoren = 0;
+        String operator = "";
+        for(int i = 0; i <bedingung.length; i++){
+            if(bedingung[i] == '='){
+                if(bedingung[i+1] == '>'){
+                    operator = "" + bedingung[i] + bedingung[i+1];
+                    i++;
+                }else if(bedingung[i+1] == '<'){
+                    operator = "" + bedingung[i] + bedingung[i+1];
+                    i++;
+                }else{
+                    operator = "" + bedingung[i];
+                }
+                gefundeneOperatoren++;
+            }else if(bedingung[i] == '>'){
+                operator = "" + bedingung[i];
+                gefundeneOperatoren++;
+            }else if(bedingung[i] == '<'){
+                operator = "" + bedingung[i];
+                gefundeneOperatoren++;
+            }
+        }
+        if(gefundeneOperatoren == 1){
+            return operator;
+        }else return null;
     }
 }

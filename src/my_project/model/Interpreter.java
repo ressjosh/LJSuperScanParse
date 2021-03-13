@@ -48,17 +48,22 @@ public class Interpreter extends GraphicalObject {
     }
 
     private void interpret02(){
-        if(!scanner.getType().equals("NODATA")) {
-            if (scanner.getType().equals("bewegung")) {
-                fuehreBewegungAus();
-            } else if (scanner.getType().equals("baum")) {
-                arbeiteAnBaum();
-            }else if (scanner.getType().equals("methodenaufruf")) {
-                bearbeiteMethode();
-            }
-            scanner.nextToken();
-            timer = 2;
-        }else interpretiere = false;
+        try {
+            if (!scanner.getType().equals("NODATA")) {
+                if (scanner.getType().equals("bewegung")) {
+                    fuehreBewegungAus();
+                } else if (scanner.getType().equals("baum")) {
+                    arbeiteAnBaum();
+                } else if (scanner.getType().equals("methodenaufruf")) {
+                    bearbeiteMethode(scanner.getThis(scanner.getValue()).getCommands());
+                }
+                scanner.nextToken();
+                timer = 2;
+            } else interpretiere = false;
+        }catch(Exception e){
+            System.out.println("Error 2");
+            interpretiere = false;
+        }
     }
 
     @Override
@@ -93,13 +98,13 @@ public class Interpreter extends GraphicalObject {
             vC.getAktuellesFeld().erhoeheBaumAnzahl(1);
         }else if(scanner.getValue().equals("ernten")){
             if(vC.getAktuellesFeld().getBaumAnzahl() > 0 ){
-                vC.getAktuellesFeld().setBaumAnzahl(-1);
+                vC.getAktuellesFeld().erhoeheBaumAnzahl(-1);
             }else JOptionPane.showMessageDialog(null, "Hier ist nichts zum ernten");
         }
     }
 
-    private void bearbeiteMethode(){
-        List<String> commands = scanner.getThis(scanner.getValue()).getCommands();
+    private void bearbeiteMethode(List<String> methodeninhalt){
+        List<String> commands = methodeninhalt;
         commands.toFirst();
         while(commands.hasAccess()) {
             System.out.println(commands.getContent());
@@ -115,6 +120,8 @@ public class Interpreter extends GraphicalObject {
                 if(vC.getAktuellesFeld().getBaumAnzahl() > 0 ){
                     vC.getAktuellesFeld().setBaumAnzahl(-1);
                 }else JOptionPane.showMessageDialog(null, "Hier ist nichts zum ernten");
+            }else{
+                bearbeiteMethode(scanner.getThis(commands.getContent()).getCommands());
             }
             commands.next();
         }
