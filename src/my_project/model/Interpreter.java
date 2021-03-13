@@ -56,6 +56,8 @@ public class Interpreter extends GraphicalObject {
                     arbeiteAnBaum();
                 } else if (scanner.getType().equals("methodenaufruf")) {
                     bearbeiteMethode(scanner.getThis(scanner.getValue()).getCommands());
+                }else if (scanner.getType().equals("verzweigung")) {
+                    bearbeiteVerzweigung();
                 }
                 scanner.nextToken();
                 timer = 2;
@@ -147,5 +149,12 @@ public class Interpreter extends GraphicalObject {
         }
     }
 
-
+    private void bearbeiteVerzweigung(){
+        Verzweigung diese = scanner.getVerzweigungsInfo(Integer.parseInt(scanner.getValue()));
+        if(!diese.bedingungpruefen()){
+            for(int i = 0; i < diese.anzahlbefehle(); i++){
+                scanner.nextToken();
+            }
+        }
+    }
 }

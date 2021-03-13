@@ -1,6 +1,7 @@
 package my_project.model;
 
 import KAGO_framework.model.abitur.datenstrukturen.List;
+import my_project.control.ViewControll;
 
 import javax.swing.*;
 import javax.xml.stream.events.Characters;
@@ -15,10 +16,14 @@ public class CodeScanner extends Scanner<String,String> {
     private String aktuelleBefehleString;
     private CodeParser parser;
     private List<Methode> methodenliste;
+    private List<Verzweigung> verzweigungen;
+    private ViewControll vC;
 
-    public CodeScanner() {
+    public CodeScanner(ViewControll vC) {
+        this.vC = vC;
         parser = new CodeParser(this);
         methodenliste = new List<>();
+        verzweigungen = new List<>();
     }
 
     @Override
@@ -61,20 +66,25 @@ public class CodeScanner extends Scanner<String,String> {
                 int laenge = ermitteleMethodenkopf(i);
                 this.tokenList.append(new Token(input.substring(i+8, i+laenge),"methodenaufruf"));
                 i = i+laenge;
+            }else if (i+3 < input.length() && (input.substring(i, i+4)).equals("wenn")) {
+                this.tokenList.append(new Token(""+i,"verzweigung"));
+                if(!scanneUndParseBedingung(i+3, i)) return false;
+                while(aktuelleBefehleString.charAt(i) != '#') i++;
             }else if (input.charAt(i) == ' ') {
 
             }else return false;
 
         }
-        this.tokenList.append(new Token("#","NODATA"));
-        tokenList.toFirst(); // WICHTIG!
         return true;
     }
 
     private boolean scanneCode(){
         methodenliste = new List<>();
         this.tokenList = new List();
+        verzweigungen = new List<>();
         if(scan(aktuelleBefehleString)){
+            this.tokenList.append(new Token("#","NODATA"));
+            tokenList.toFirst(); // WICHTIG!
             return parser.parse();
         }else return false;
     }
@@ -91,7 +101,6 @@ public class CodeScanner extends Scanner<String,String> {
         for(int i = 0; i < aktuelleBefehle.length; i++){
             tmp = tmp + aktuelleBefehle[i];
         }
-        System.out.println(aktuelleBefehle.length);
         return tmp;
     }
 
@@ -156,23 +165,27 @@ public class CodeScanner extends Scanner<String,String> {
     }
 
     public Verzweigung getVerzweigungsInfo(int index){
-        return new Verzweigung(this, null, 0, 0);
+        verzweigungen.toFirst();
+        while(verzweigungen.hasAccess() && verzweigungen.getContent().getMyIndex() != index){
+            verzweigungen.next();
+        }
+        return verzweigungen.getContent();
     }
 
     private boolean scanneUndParseBedingung(int i, int bedingugnsIndex){
         String input = aktuelleBefehleString;
-        int tmp = 1;
-        while (aktuelleBefehleString.charAt(i + tmp) == ' ') {
+        int tmp = i+1;
+        while (aktuelleBefehleString.charAt(tmp) == ' ') {
             tmp = tmp + 1;
         }
-        if(tmp+9 < input.length() && (input.substring(tmp, tmp+10)).equals("nussHier()")){
+        if(tmp+7 < input.length() && (input.substring(tmp, tmp+8)).equals("nussHier")){
             return scanneUndParseVerzweigung("nussHier", bedingugnsIndex);
-        }else if(tmp+11 < input.length() && (input.substring(tmp, tmp+12)).equals("wandVoraus()")){
+        }else if(tmp+11 < input.length() && (input.substring(tmp, tmp+12)).equals("wandVoraus")){
             return scanneUndParseVerzweigung("wandVoraus", bedingugnsIndex);
         }else{
             int beginn = tmp;
             int ende = 0;
-            while (aktuelleBefehleString.charAt(i + tmp) != ' ') {
+            while (aktuelleBefehleString.charAt(tmp) != ' ') {
                 tmp = tmp + 1;
             }
             ende = tmp - 1;
@@ -187,15 +200,16 @@ public class CodeScanner extends Scanner<String,String> {
         }
     }
 
-    private boolean scanneUndParseVerzweigung(String bedingung, int bedingugnsIndex){
-        int tmp = bedingugnsIndex;
+    private boolean scanneUndParseVerzweigung(String bedingung, int bedingungsIndex){
+        int tmp = bedingungsIndex;
         while(aktuelleBefehleString.charAt(tmp) != '#') tmp++;
-        //scan(aktuelleBefehleString)
-        return false;
+        int anzahlbefehle = ermitteleAnzahlBefehle(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
+        verzweigungen.append(new Verzweigung(this, bedingung, anzahlbefehle, bedingungsIndex, vC));
+        return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
     }
 
     public boolean ausZahlen(String potentielleZahl){
-        if(potentielleZahl.equals("nussZahl") || potentielleZahl.equals("nusseGesammelt")) return true;
+        if(potentielleZahl.equals("nussAnzahl") || potentielleZahl.equals("nusseGesammelt")) return true;
 
         //Todo Bei Parametereinabreitung hier unbedingt neue Listenüberprüfung beifügen!
 
@@ -232,5 +246,11 @@ public class CodeScanner extends Scanner<String,String> {
         if(gefundeneOperatoren == 1){
             return operator;
         }else return null;
+    }
+
+    private int ermitteleAnzahlBefehle(String s){
+        String[] befehlfolge = s.trim().split(" ");
+        int anzahlBefehle = befehlfolge.length;
+        return anzahlBefehle;
     }
 }

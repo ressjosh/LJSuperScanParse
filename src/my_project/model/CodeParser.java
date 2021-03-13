@@ -22,7 +22,8 @@ public class CodeParser implements Parser {
             }
             if(scanner.getType().equals("befehle")) {
                 scanner.nextToken();
-                while (scanner.getType().equals("bewegung") || scanner.getType().equals("baum") ||scanner.getType().equals("methodenaufruf")  ) {
+                while (scanner.getType().equals("bewegung") || scanner.getType().equals("baum") ||scanner.getType().equals("methodenaufruf")
+                        || scanner.getType().equals("verzweigung")) {
                     scanner.nextToken();
                 }
                 if(scanner.getType().equals("ende")){

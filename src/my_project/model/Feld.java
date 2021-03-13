@@ -12,6 +12,7 @@ public class Feld extends GraphicalObject {
     private int aktuellesBild;
 
     public Feld() {
+        baumdrauf = false;
         aktuellesBild = 0;
         images = new BufferedImage[4];
         setNewImage("assets/grass.jpg");
@@ -32,12 +33,16 @@ public class Feld extends GraphicalObject {
     public void setBaumAnzahl(int baumAnzahl) {
         this.baumAnzahl = baumAnzahl;
         if(baumAnzahl == 0){
+            baumdrauf = false;
             aktuellesBild = 0;
         }else if(baumAnzahl == 1){
+            baumdrauf = true;
             aktuellesBild = 1;
         }else if(baumAnzahl == 2){
+            baumdrauf = true;
             aktuellesBild = 2;
         }else if(baumAnzahl > 2){
+            baumdrauf = true;
             aktuellesBild = 3;
         }
     }
@@ -45,12 +50,16 @@ public class Feld extends GraphicalObject {
     public void erhoeheBaumAnzahl(int anzahl) {
         baumAnzahl = baumAnzahl + anzahl;
         if(baumAnzahl == 0){
+            baumdrauf = false;
             aktuellesBild = 0;
         }else if(baumAnzahl == 1){
+            baumdrauf = true;
             aktuellesBild = 1;
         }else if(baumAnzahl == 2){
+            baumdrauf = true;
             aktuellesBild = 2;
         }else if(baumAnzahl > 2){
+            baumdrauf = true;
             aktuellesBild = 3;
         }
     }

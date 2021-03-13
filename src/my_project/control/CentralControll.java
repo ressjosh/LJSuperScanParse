@@ -16,7 +16,7 @@ public class CentralControll {
     public CentralControll(ViewController vC) {
         this.vC = vC;
         viewControll = new ViewControll(this, vC);
-        scanner = new CodeScanner();
+        scanner = new CodeScanner(viewControll);
         interpreter = new Interpreter(this, viewControll);
     }
 

@@ -1,5 +1,7 @@
 package my_project.model;
 
+import my_project.control.ViewControll;
+
 public class Verzweigung{
 
     private String bedingung;
@@ -7,8 +9,11 @@ public class Verzweigung{
     private int bedingungsart;
     private int laenge;
     private CodeScanner scanner;
+    private ViewControll vC;
 
-    public Verzweigung(CodeScanner scanner, String bedingung,int anzahlbefehle, int verzweigungsindex) {
+    public Verzweigung(CodeScanner scanner, String bedingung,int anzahlbefehle, int verzweigungsindex, ViewControll vC) {
+        this.vC = vC;
+        System.out.println("Verzweigung gefunden mit: Bedingung " + bedingung + "befehlAnzahl: " + anzahlbefehle+ "Index: "+ verzweigungsindex);
         this.scanner = scanner;
         this.bedingung = bedingung;
         this.index = verzweigungsindex;
@@ -17,7 +22,44 @@ public class Verzweigung{
     }
 
     public boolean bedingungpruefen(){
-        return false;
+        if(bedingungsart ==0){
+            System.out.println("Korrekte Bedingungsoption erreicht");
+            int operator = operatorFiltern();
+            String[] werte;
+            if (operator == 0) {
+                werte = bedingung.split("=");
+                System.out.println("Korrekte Bedingungsoption erreicht "+ werte[0] + ":" +werte[1] );
+                if(gibZahlenwertWieder(werte[0]) == gibZahlenwertWieder(werte[1])){
+                    return true;
+                }else return false;
+            }else if(operator == 1){
+                werte = bedingung.split("=>");
+                if(gibZahlenwertWieder(werte[0]) >= gibZahlenwertWieder(werte[1])){
+                    return true;
+                }else return false;
+            }else if(operator == 2){
+                werte = bedingung.split("=<");
+                if(gibZahlenwertWieder(werte[0]) <= gibZahlenwertWieder(werte[1])){
+                    return true;
+                }else return false;
+            }else if(operator == 3){
+                werte = bedingung.split(">");
+                if(gibZahlenwertWieder(werte[0]) > gibZahlenwertWieder(werte[1])){
+                    return true;
+                }else return false;
+            }else if(operator == 4){
+                werte = bedingung.split("<");
+                if(gibZahlenwertWieder(werte[0]) < gibZahlenwertWieder(werte[1])){
+                    return true;
+                }else return false;
+            }
+        }else if(bedingung.equals("nussHier")){
+            System.out.println("Bedingungsprüfung: " +vC.getAktuellesFeld().isBaumdrauf());
+            return vC.getAktuellesFeld().isBaumdrauf();
+        }else if(bedingung.equals("wandVoraus")){
+
+        }
+        return true;
     }
 
     public int anzahlbefehle(){
@@ -36,5 +78,43 @@ public class Verzweigung{
         if(operator == true){
             bedingungsart = 0;
         }else bedingungsart = 1;
+    }
+
+    public int getMyIndex(){
+        return index;
+    }
+    /* = ist 0
+       => ist 1
+       =< ist 2
+       > ist 3
+       < ist 4
+     */
+    private int operatorFiltern(){
+        char[] bedingung0 = bedingung.toCharArray();
+        for(int i = 0; i <bedingung0.length; i++){
+            if(bedingung0[i] == '='){
+                if(bedingung0[i+1] == '>'){
+                    return 1;
+                }else if(bedingung0[i+1] == '<'){
+                   return 2;
+                }else{
+                    return 0;
+                }
+            }else if(bedingung0[i] == '>'){
+                return 3;
+            }else if(bedingung0[i] == '<'){
+                return 4;
+            }
+        }
+        return 0;
+    }
+
+    private int gibZahlenwertWieder(String zahl){
+        if(zahl.equals("nussAnzahl")){
+            return vC.getAktuellesFeld().getBaumAnzahl();
+        }else if(zahl.equals("nusseGesammelt")){
+
+        }
+        return Integer.parseInt(zahl);
     }
 }
