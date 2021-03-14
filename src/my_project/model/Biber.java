@@ -8,6 +8,7 @@ public class Biber extends GraphicalObject {
     private int richtung;
     private int hoehe;
     private int weite;
+    private boolean AMfressen;
     private BufferedImage[] biberBilder;
 
     public Biber() {
@@ -23,6 +24,14 @@ public class Biber extends GraphicalObject {
         richtung = 0;
         hoehe = 2;
         weite = 0;
+    }
+
+    public boolean isAMfressen() {
+        return AMfressen;
+    }
+
+    public void setAMfressen(boolean AMfressen) {
+        this.AMfressen = AMfressen;
     }
 
     public int getRichtung() {
