@@ -77,7 +77,6 @@ public class Interpreter extends GraphicalObject {
     }
 
     public void start(CodeScanner scanner){
-
         this.scanner = scanner;
         scanner.tokenList.toFirst();
         interpretiere = true;

@@ -6,17 +6,15 @@ import my_project.control.ViewControll;
 import javax.swing.*;
 import javax.xml.stream.events.Characters;
 
-/**
- * Diese Klasse scannt Strings für die Sprache L_Knebi = k(ne)*bi
- */
+
 public class CodeScanner extends Scanner<String,String> {
 
-    private String debugOutput;
     private String[] aktuelleBefehle;
     private String aktuelleBefehleString;
     private CodeParser parser;
     private List<Methode> methodenliste;
     private List<Verzweigung> verzweigungen;
+    private Parameter parameter;
     private ViewControll vC;
 
     public CodeScanner(ViewControll vC) {
@@ -24,6 +22,7 @@ public class CodeScanner extends Scanner<String,String> {
         parser = new CodeParser(this);
         methodenliste = new List<>();
         verzweigungen = new List<>();
+        parameter = new Parameter(this);
     }
 
     @Override
@@ -80,6 +79,22 @@ public class CodeScanner extends Scanner<String,String> {
                 this.tokenList.append(new Token(""+i,"verzweigung"));
                 if(!scanneUndParseBedingung(i+3, i, null)) return false;
                 while(aktuelleBefehleString.charAt(i) != '#') i++;
+            }else if (i+2 < input.length() && (input.substring(i, i+3)).equals("sub")) {
+                int laenge = laengeAddSub(i);
+                this.tokenList.append(new Token(input.substring(i+4,i+laenge),"subtrahieren"));
+                i = i+laenge;
+            }else if (i+2 < input.length() && (input.substring(i, i+3)).equals("add")) {
+                int laenge = laengeAddSub(i);
+                this.tokenList.append(new Token(input.substring(i+4,i+laenge),"addieren"));
+                i = i+laenge;
+            }else if (i+7 < input.length() && (input.substring(i, i+8)).equals("methoden")) {
+                this.tokenList.append(new Token("methoden","methoden"));
+                i = i+7;
+            }else if (i+2 < input.length() && (input.substring(i, i+3)).equals("int")) {
+                //TODO WEINE! Konzipieren Parameteranfangswertzuweisung
+                this.tokenList.append(new Token(""+i,"verzweigung"));
+                if(!scanneUndParseBedingung(i+3, i, null)) return false;
+                while(aktuelleBefehleString.charAt(i) != '#') i++;
             }else if (input.charAt(i) == ' ') {
 
             }else return false;
@@ -130,6 +145,7 @@ public class CodeScanner extends Scanner<String,String> {
         methodenliste.append(newMethod);
         return scanneMethode(i, newMethod);
     }
+
     private boolean scanneMethode(int i, Methode newMethod){
         String input = aktuelleBefehleString;
         int j = i;
@@ -155,7 +171,7 @@ public class CodeScanner extends Scanner<String,String> {
                 j = j+laenge;
             }else if (j+3 < input.length() && (input.substring(j, j+4)).equals("wenn")) {
                 newMethod.tokenList.append(new Token(""+j,"verzweigung"));
-                if(!scanneUndParseBedingung(i+3, i, newMethod)) return false;
+                if(!scanneUndParseBedingung(j+3, j, newMethod)) return false;
                 while(aktuelleBefehleString.charAt(j) != '#') j++;
 
             }else if (input.charAt(j) == ' ') {
@@ -238,7 +254,7 @@ public class CodeScanner extends Scanner<String,String> {
         int anzahlbefehle = ermitteleAnzahlBefehle(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
         verzweigungen.append(new Verzweigung(this, bedingung, anzahlbefehle, bedingungsIndex, vC));
         if(innerhalbMethode == null){
-            return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
+            return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
         }else{
             return scanneMethode(bedingungsIndex+5 + bedingung.length(), innerhalbMethode);
         }
@@ -289,5 +305,16 @@ public class CodeScanner extends Scanner<String,String> {
         String[] befehlfolge = s.trim().split(" ");
         int anzahlBefehle = befehlfolge.length;
         return anzahlBefehle;
+    }
+
+    private int laengeAddSub(int i){
+        int tmp = 3;
+        while(aktuelleBefehleString.charAt(i+tmp) == ' '){
+            tmp = tmp +1;
+        }
+        while(aktuelleBefehleString.charAt(i+tmp) != ' '){
+            tmp = tmp +1;
+        }
+        return tmp;
     }
 }
