@@ -79,7 +79,7 @@ public class CodeScanner extends Scanner<String,String> {
                 this.tokenList.append(new Token(""+i,"verzweigung"));
                 if(!scanneUndParseBedingung(i+3, i, null)) return false;
                 while(aktuelleBefehleString.charAt(i) != '#') i++;
-            }else if (i+2 < input.length() && (input.substring(i, i+3)).equals("sub")) {
+            /**}else if (i+2 < input.length() && (input.substring(i, i+3)).equals("sub")) {
                 int laenge = laengeAddSub(i);
                 this.tokenList.append(new Token(input.substring(i+4,i+laenge),"subtrahieren"));
                 i = i+laenge;
@@ -94,7 +94,7 @@ public class CodeScanner extends Scanner<String,String> {
                 //TODO WEINE! Konzipieren Parameteranfangswertzuweisung
                 this.tokenList.append(new Token(""+i,"verzweigung"));
                 if(!scanneUndParseBedingung(i+3, i, null)) return false;
-                while(aktuelleBefehleString.charAt(i) != '#') i++;
+                while(aktuelleBefehleString.charAt(i) != '#') i++;*/
             }else if (input.charAt(i) == ' ') {
 
             }else return false;
