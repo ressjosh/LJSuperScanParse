@@ -64,10 +64,6 @@ public class Interpreter extends GraphicalObject {
                     parameter.addiere(scanner.getValue());
                 }else if (scanner.getType().equals("subtrahieren")) {
                     parameter.subtrahiere(scanner.getValue());
-                }else if (scanner.getType().equals("parameter")) {
-                    String[] tmp = scanner.getValue().split(" ");
-                    System.out.println("Hier wurde ein Parameter angelegt: " + tmp[0] + "; " + tmp[1]);
-                    parameter.legeParameterAn(tmp[0], tmp[1]);
                 }
                 scanner.nextToken();
                 timer = 2;
@@ -173,5 +169,13 @@ public class Interpreter extends GraphicalObject {
                 methode.nextToken();
             }
         }
+    }
+
+    public Parameter getParameter(){
+        return parameter;
+    }
+
+    public void setInterpretiere(boolean b){
+        interpretiere = b;
     }
 }

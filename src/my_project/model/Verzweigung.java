@@ -2,6 +2,8 @@ package my_project.model;
 
 import my_project.control.ViewControll;
 
+import javax.swing.*;
+
 public class Verzweigung{
 
     private String bedingung;
@@ -10,10 +12,12 @@ public class Verzweigung{
     private int laenge;
     private CodeScanner scanner;
     private ViewControll vC;
+    private Interpreter interpreter;
 
-    public Verzweigung(CodeScanner scanner, String bedingung,int anzahlbefehle, int verzweigungsindex, ViewControll vC) {
+    public Verzweigung(CodeScanner scanner, Interpreter i, String bedingung,int anzahlbefehle, int verzweigungsindex, ViewControll vC) {
+        System.out.println(bedingung);
         this.vC = vC;
-        System.out.println("Verzweigung gefunden mit: Bedingung " + bedingung + "befehlAnzahl: " + anzahlbefehle+ "Index: "+ verzweigungsindex);
+        interpreter = i;
         this.scanner = scanner;
         this.bedingung = bedingung;
         this.index = verzweigungsindex;
@@ -22,44 +26,48 @@ public class Verzweigung{
     }
 
     public boolean bedingungpruefen(){
-        if(bedingungsart ==0){
-            System.out.println("Korrekte Bedingungsoption erreicht");
-            int operator = operatorFiltern();
-            String[] werte;
-            if (operator == 0) {
-                werte = bedingung.split("=");
-                System.out.println("Korrekte Bedingungsoption erreicht "+ werte[0] + ":" +werte[1] );
-                if(gibZahlenwertWieder(werte[0]) == gibZahlenwertWieder(werte[1])){
-                    return true;
-                }else return false;
-            }else if(operator == 1){
-                werte = bedingung.split("=>");
-                if(gibZahlenwertWieder(werte[0]) >= gibZahlenwertWieder(werte[1])){
-                    return true;
-                }else return false;
-            }else if(operator == 2){
-                werte = bedingung.split("=<");
-                if(gibZahlenwertWieder(werte[0]) <= gibZahlenwertWieder(werte[1])){
-                    return true;
-                }else return false;
-            }else if(operator == 3){
-                werte = bedingung.split(">");
-                if(gibZahlenwertWieder(werte[0]) > gibZahlenwertWieder(werte[1])){
-                    return true;
-                }else return false;
-            }else if(operator == 4){
-                werte = bedingung.split("<");
-                if(gibZahlenwertWieder(werte[0]) < gibZahlenwertWieder(werte[1])){
-                    return true;
-                }else return false;
-            }
-        }else if(bedingung.equals("nussHier")){
-            System.out.println("Bedingungsprüfung: " +vC.getAktuellesFeld().isBaumdrauf());
-            return vC.getAktuellesFeld().isBaumdrauf();
-        }else if(bedingung.equals("wandVoraus")){
+        try {
+            if (bedingungsart == 0) {
+                int operator = operatorFiltern();
+                String[] werte;
+                if (operator == 0) {
+                    werte = bedingung.split("=");
+                    if (gibZahlenwertWieder(werte[0]) == gibZahlenwertWieder(werte[1])) {
+                        return true;
+                    } else return false;
+                } else if (operator == 1) {
+                    werte = bedingung.split("=>");
+                    if (gibZahlenwertWieder(werte[0]) >= gibZahlenwertWieder(werte[1])) {
+                        return true;
+                    } else return false;
+                } else if (operator == 2) {
+                    werte = bedingung.split("=<");
+                    if (gibZahlenwertWieder(werte[0]) <= gibZahlenwertWieder(werte[1])) {
+                        return true;
+                    } else return false;
+                } else if (operator == 3) {
+                    werte = bedingung.split(">");
+                    if (gibZahlenwertWieder(werte[0]) > gibZahlenwertWieder(werte[1])) {
+                        return true;
+                    } else return false;
+                } else if (operator == 4) {
+                    werte = bedingung.split("<");
+                    if (gibZahlenwertWieder(werte[0]) < gibZahlenwertWieder(werte[1])) {
+                        return true;
+                    } else return false;
+                }
+            } else if (bedingung.equals("nussHier")) {
+                System.out.println("Bedingungsprüfung: " + vC.getAktuellesFeld().isBaumdrauf());
+                return vC.getAktuellesFeld().isBaumdrauf();
+            } else if (bedingung.equals("wandVoraus")) {
 
+            }
+            return true;
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Error 3");
+            interpreter.setInterpretiere(false);
+            return false;
         }
-        return true;
     }
 
     public int anzahlbefehle(){
@@ -114,6 +122,8 @@ public class Verzweigung{
             return vC.getAktuellesFeld().getBaumAnzahl();
         }else if(zahl.equals("nusseGesammelt")){
 
+        }else if(interpreter.getParameter().istParameter(zahl)){
+            return interpreter.getParameter().gibWert(zahl);
         }
         return Integer.parseInt(zahl);
     }

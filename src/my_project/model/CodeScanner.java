@@ -1,6 +1,7 @@
 package my_project.model;
 
 import KAGO_framework.model.abitur.datenstrukturen.List;
+import my_project.control.CentralControll;
 import my_project.control.ViewControll;
 
 import javax.swing.*;
@@ -15,8 +16,10 @@ public class CodeScanner extends Scanner<String,String> {
     private List<Methode> methodenliste;
     private List<Verzweigung> verzweigungen;
     private ViewControll vC;
+    private CentralControll cC;
 
-    public CodeScanner(ViewControll vC) {
+    public CodeScanner(ViewControll vC, CentralControll cC) {
+        this.cC = cC;
         this.vC = vC;
         parser = new CodeParser(this);
         methodenliste = new List<>();
@@ -96,10 +99,9 @@ public class CodeScanner extends Scanner<String,String> {
                 this.tokenList.append(new Token("methoden","methoden"));
                 i = i+8;
             }else if (i+2 < input.length() && (input.substring(i, i+3)).equals("int")) {
-                System.out.println("Int erkannt");
                 int parameterTeile = ermitteleParameterElemente(i+3);
-                System.out.println("so lang ist der Teil: " + parameterTeile +input.substring(i+3, parameterTeile));
-                this.tokenList.append(new Token(input.substring(i+3, parameterTeile).trim(),"parameter"));
+                String[] tmp = input.substring(i+3, parameterTeile).trim().split(" ");
+                cC.getInterpreter().getParameter().legeParameterAn(tmp[0], tmp[1]);
                 i = parameterTeile-1;
             }else if (input.charAt(i) == ' ') {
 
@@ -287,7 +289,7 @@ public class CodeScanner extends Scanner<String,String> {
             tmp++;
         }
         int anzahlbefehle = ermitteleAnzahlBefehle(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
-        verzweigungen.append(new Verzweigung(this, bedingung, anzahlbefehle, bedingungsIndex, vC));
+        verzweigungen.append(new Verzweigung(this, cC.getInterpreter(), bedingung, anzahlbefehle, bedingungsIndex, vC));
         if(innerhalbMethode == null){
             return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
         }else{
@@ -297,9 +299,11 @@ public class CodeScanner extends Scanner<String,String> {
 
     public boolean ausZahlen(String potentielleZahl){
         if(potentielleZahl.equals("nussAnzahl") || potentielleZahl.equals("nusseGesammelt")) return true;
-
-        //Todo Bei Parametereinabreitung hier unbedingt neue Listenüberprüfung beifügen!
-
+        System.out.println("Hello, there" + potentielleZahl);
+        if(cC.getInterpreter().getParameter().istParameter(potentielleZahl)){
+            System.out.println("Parameter eraknnt");
+            return true;
+        }
         char[] tmp = potentielleZahl.toCharArray();
         for(int i = 0; i < tmp.length; i++){
             if(!Character.isDigit(tmp[i])) return false;
