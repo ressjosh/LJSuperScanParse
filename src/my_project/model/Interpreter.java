@@ -13,6 +13,7 @@ public class Interpreter extends GraphicalObject {
     private ViewControll vC;
     private double timer;
     private boolean interpretiere;
+    private Parameter parameter;
 
      List tokenList;
      Scanner.Token token;
@@ -22,6 +23,7 @@ public class Interpreter extends GraphicalObject {
         interpretiere = false;
         timer = 2;
         tokenList = new List<Scanner.Token>();
+        parameter = new Parameter(null);
     }
 
 
@@ -58,6 +60,10 @@ public class Interpreter extends GraphicalObject {
                     bearbeiteMethode(scanner.getThis(scanner.getValue()));
                 }else if (scanner.getType().equals("verzweigung")) {
                     bearbeiteVerzweigung();
+                }else if (scanner.getType().equals("addieren")) {
+                    parameter.addiere(scanner.getValue());
+                }else if (scanner.getType().equals("subtrahieren")) {
+                    parameter.subtrahiere(scanner.getValue());
                 }
                 scanner.nextToken();
                 timer = 2;
@@ -77,7 +83,6 @@ public class Interpreter extends GraphicalObject {
     }
 
     public void start(CodeScanner scanner){
-
         this.scanner = scanner;
         scanner.tokenList.toFirst();
         interpretiere = true;
@@ -164,5 +169,13 @@ public class Interpreter extends GraphicalObject {
                 methode.nextToken();
             }
         }
+    }
+
+    public Parameter getParameter(){
+        return parameter;
+    }
+
+    public void setInterpretiere(boolean b){
+        interpretiere = b;
     }
 }

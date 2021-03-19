@@ -1,25 +1,25 @@
 package my_project.model;
 
 import KAGO_framework.model.abitur.datenstrukturen.List;
+import my_project.control.CentralControll;
 import my_project.control.ViewControll;
 
 import javax.swing.*;
 import javax.xml.stream.events.Characters;
 
-/**
- * Diese Klasse scannt Strings für die Sprache L_Knebi = k(ne)*bi
- */
+
 public class CodeScanner extends Scanner<String,String> {
 
-    private String debugOutput;
     private String[] aktuelleBefehle;
     private String aktuelleBefehleString;
     private CodeParser parser;
     private List<Methode> methodenliste;
     private List<Verzweigung> verzweigungen;
     private ViewControll vC;
+    private CentralControll cC;
 
-    public CodeScanner(ViewControll vC) {
+    public CodeScanner(ViewControll vC, CentralControll cC) {
+        this.cC = cC;
         this.vC = vC;
         parser = new CodeParser(this);
         methodenliste = new List<>();
@@ -64,10 +64,8 @@ public class CodeScanner extends Scanner<String,String> {
                 int anzahlRauten = 1;
                 while(anzahlRauten!= 0){
                     if (i+3 < input.length() && (input.substring(i, i+4)).equals("wenn")){
-                        System.out.println("Raute hinzugefügt");
                         anzahlRauten++;
                     }else if(input.charAt(i) == '#'){
-                        System.out.println("Raute entfernt");
                         anzahlRauten--;
                     }
                     i++;
@@ -79,7 +77,32 @@ public class CodeScanner extends Scanner<String,String> {
             }else if (i+3 < input.length() && (input.substring(i, i+4)).equals("wenn")) {
                 this.tokenList.append(new Token(""+i,"verzweigung"));
                 if(!scanneUndParseBedingung(i+3, i, null)) return false;
-                while(aktuelleBefehleString.charAt(i) != '#') i++;
+                int anzahlRauten = 1;
+                i = i+4;
+                while(anzahlRauten!= 0){
+                    if (i+3 < input.length() && (input.substring(i, i+4)).equals("wenn")){
+                        anzahlRauten++;
+                    }else if(input.charAt(i) == '#'){
+                        anzahlRauten--;
+                    }
+                    i++;
+                }
+            }else if (i+2 < input.length() && (input.substring(i, i+3)).equals("sub")) {
+                int laenge = laengeAddSub(i);
+                this.tokenList.append(new Token(input.substring(i+4,i+laenge),"subtrahieren"));
+                i = i+laenge;
+            }else if (i+2 < input.length() && (input.substring(i, i+3)).equals("add")) {
+                int laenge = laengeAddSub(i);
+                this.tokenList.append(new Token(input.substring(i+4,i+laenge),"addieren"));
+                i = i+laenge;
+            }else if (i+8 < input.length() && (input.substring(i, i+9)).equals("functions")) {
+                this.tokenList.append(new Token("methoden","methoden"));
+                i = i+8;
+            }else if (i+2 < input.length() && (input.substring(i, i+3)).equals("int")) {
+                int parameterTeile = ermitteleParameterElemente(i+3);
+                String[] tmp = input.substring(i+3, parameterTeile).trim().split(" ");
+                cC.getInterpreter().getParameter().legeParameterAn(tmp[0], tmp[1]);
+                i = parameterTeile-1;
             }else if (input.charAt(i) == ' ') {
 
             }else return false;
@@ -88,13 +111,32 @@ public class CodeScanner extends Scanner<String,String> {
         return true;
     }
 
+    private int ermitteleParameterElemente(int i){
+        String input = aktuelleBefehleString;
+        int temp = i;
+        while(aktuelleBefehleString.charAt(temp) == ' '){
+            temp++;
+        }
+        while(aktuelleBefehleString.charAt(temp) != ' '){
+            temp++;
+        }
+        while(aktuelleBefehleString.charAt(temp) == ' '){
+            temp++;
+        }
+        while(aktuelleBefehleString.charAt(temp) != ' '){
+            temp++;
+        }
+        return temp;
+    }
+
+
     private boolean scanneCode(){
         methodenliste = new List<>();
         this.tokenList = new List();
         verzweigungen = new List<>();
         if(scan(aktuelleBefehleString)){
             this.tokenList.append(new Token("#","NODATA"));
-            tokenList.toFirst(); // WICHTIG!
+            tokenList.toFirst();
             return parser.parse();
         }else return false;
     }
@@ -130,6 +172,7 @@ public class CodeScanner extends Scanner<String,String> {
         methodenliste.append(newMethod);
         return scanneMethode(i, newMethod);
     }
+
     private boolean scanneMethode(int i, Methode newMethod){
         String input = aktuelleBefehleString;
         int j = i;
@@ -155,8 +198,25 @@ public class CodeScanner extends Scanner<String,String> {
                 j = j+laenge;
             }else if (j+3 < input.length() && (input.substring(j, j+4)).equals("wenn")) {
                 newMethod.tokenList.append(new Token(""+j,"verzweigung"));
-                if(!scanneUndParseBedingung(i+3, i, newMethod)) return false;
-                while(aktuelleBefehleString.charAt(j) != '#') j++;
+                if(!scanneUndParseBedingung(j+3, j, newMethod)) return false;
+                j = j+4;
+                int anzahlRauten = 1;
+                while(anzahlRauten!= 0){
+                    if (j+3 < input.length() && (input.substring(j, j+4)).equals("wenn")){
+                        anzahlRauten++;
+                    }else if(input.charAt(j) == '#'){
+                        anzahlRauten--;
+                    }
+                    j++;
+                }
+            }else if (j+2 < input.length() && (input.substring(j, j+3)).equals("sub")) {
+                int laenge = laengeAddSub(j);
+                newMethod.tokenList.append(new Token(input.substring(j+4,j+laenge),"subtrahieren"));
+                i = i+laenge;
+            }else if (j+2 < input.length() && (input.substring(j, j+3)).equals("add")) {
+                int laenge = laengeAddSub(j);
+                newMethod.tokenList.append(new Token(input.substring(j+4,j+laenge),"addieren"));
+                j = j+laenge;
 
             }else if (input.charAt(j) == ' ') {
 
@@ -165,10 +225,6 @@ public class CodeScanner extends Scanner<String,String> {
         }
         if(input.length() <= j) return false;
         return true;
-    }
-
-    public List<Methode> getMethodenliste(){
-        return methodenliste;
     }
 
     public Methode getThis(String methode){
@@ -226,19 +282,16 @@ public class CodeScanner extends Scanner<String,String> {
         int anzahlRauten = 1;
         while(anzahlRauten!= 0){
             if (tmp+3 < input.length() && (input.substring(tmp, tmp+4)).equals("wenn")){
-                System.out.println("Raute hinzugefügt");
                 anzahlRauten++;
             }else if(input.charAt(tmp) == '#'){
-                System.out.println("Raute entfernt");
                 anzahlRauten--;
             }
             tmp++;
         }
-        System.out.println(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
         int anzahlbefehle = ermitteleAnzahlBefehle(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
-        verzweigungen.append(new Verzweigung(this, bedingung, anzahlbefehle, bedingungsIndex, vC));
+        verzweigungen.append(new Verzweigung(this, cC.getInterpreter(), bedingung, anzahlbefehle, bedingungsIndex, vC));
         if(innerhalbMethode == null){
-            return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp));
+            return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
         }else{
             return scanneMethode(bedingungsIndex+5 + bedingung.length(), innerhalbMethode);
         }
@@ -246,9 +299,11 @@ public class CodeScanner extends Scanner<String,String> {
 
     public boolean ausZahlen(String potentielleZahl){
         if(potentielleZahl.equals("nussAnzahl") || potentielleZahl.equals("nusseGesammelt")) return true;
-
-        //Todo Bei Parametereinabreitung hier unbedingt neue Listenüberprüfung beifügen!
-
+        System.out.println("Hello, there" + potentielleZahl);
+        if(cC.getInterpreter().getParameter().istParameter(potentielleZahl)){
+            System.out.println("Parameter eraknnt");
+            return true;
+        }
         char[] tmp = potentielleZahl.toCharArray();
         for(int i = 0; i < tmp.length; i++){
             if(!Character.isDigit(tmp[i])) return false;
@@ -289,5 +344,16 @@ public class CodeScanner extends Scanner<String,String> {
         String[] befehlfolge = s.trim().split(" ");
         int anzahlBefehle = befehlfolge.length;
         return anzahlBefehle;
+    }
+
+    private int laengeAddSub(int i){
+        int tmp = 3;
+        while(aktuelleBefehleString.charAt(i+tmp) == ' '){
+            tmp = tmp +1;
+        }
+        while(aktuelleBefehleString.charAt(i+tmp) != ' '){
+            tmp = tmp +1;
+        }
+        return tmp;
     }
 }

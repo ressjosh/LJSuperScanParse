@@ -17,19 +17,25 @@ public class CodeParser implements Parser {
         scanner.tokenList.toFirst();
         if(scanner.getType().equals("start")){
             scanner.nextToken();
-            while(scanner.getType().equals("methodenkopf")){
+            while(scanner.getType().equals("parameter")){
                 scanner.nextToken();
             }
-            if(scanner.getType().equals("befehle")) {
+            if(scanner.getType().equals("methoden")) {
                 scanner.nextToken();
-                while (scanner.getType().equals("bewegung") || scanner.getType().equals("baum") ||scanner.getType().equals("methodenaufruf")
-                        || scanner.getType().equals("verzweigung")) {
+                while (scanner.getType().equals("methodenkopf")) {
                     scanner.nextToken();
                 }
-                if(scanner.getType().equals("ende")){
+                if (scanner.getType().equals("befehle")) {
                     scanner.nextToken();
-                    if(scanner.getType().equals("NODATA")) {
-                        return true;
+                    while (scanner.getType().equals("bewegung") || scanner.getType().equals("baum") || scanner.getType().equals("methodenaufruf")
+                            || scanner.getType().equals("verzweigung")|| scanner.getType().equals("subtrahieren")|| scanner.getType().equals("addieren")) {
+                        scanner.nextToken();
+                    }
+                    if (scanner.getType().equals("ende")) {
+                        scanner.nextToken();
+                        if (scanner.getType().equals("NODATA")) {
+                            return true;
+                        }
                     }
                 }
             }

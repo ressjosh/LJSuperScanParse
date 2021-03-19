@@ -1,6 +1,7 @@
 package my_project.model;
 
 import KAGO_framework.model.abitur.datenstrukturen.List;
+import com.sun.jdi.Value;
 
 public abstract class KrasseListe<TokenValue,TokenType> {
     /**
@@ -27,6 +28,13 @@ public abstract class KrasseListe<TokenValue,TokenType> {
             return type;
         }
 
+        public void setValue(Value value) {
+            this.value = value;
+        }
+
+        public void setType(Type type) {
+            this.type = type;
+        }
     }
 
     // Hinweis: doppelte Generik, da List generisch von Token abhängt und Token von den Datentypen von Wert und Typ.
@@ -60,6 +68,12 @@ public abstract class KrasseListe<TokenValue,TokenType> {
      */
     public void nextToken(){
         tokenList.next();
+    }
+
+    public void setValue(TokenValue value){
+        if (tokenList.hasAccess()){
+            tokenList.getContent().setValue(value);
+        }
     }
 
 }
