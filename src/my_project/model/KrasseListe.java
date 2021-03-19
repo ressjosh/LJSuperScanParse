@@ -1,7 +1,7 @@
 package my_project.model;
 
 import KAGO_framework.model.abitur.datenstrukturen.List;
-import com.sun.jdi.Value;
+//import com.sun.jdi.Value;
 
 public abstract class KrasseListe<TokenValue,TokenType> {
     /**

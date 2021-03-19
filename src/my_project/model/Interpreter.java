@@ -2,6 +2,7 @@ package my_project.model;
 
 import KAGO_framework.model.GraphicalObject;
 import KAGO_framework.model.abitur.datenstrukturen.List;
+import KAGO_framework.model.abitur.datenstrukturen.Stack;
 import my_project.control.CentralControll;
 import my_project.control.ViewControll;
 
@@ -14,27 +15,17 @@ public class Interpreter extends GraphicalObject {
     private double timer;
     private boolean interpretiere;
     private Parameter parameter;
+    private List<KrasseListe<String,String>.Token<String, String>> arbeitsliste;
+    private int befehlsnummer;
 
-     List tokenList;
-     Scanner.Token token;
     public Interpreter(CentralControll cC, ViewControll vC){
         this.cC = cC;
         this.vC = vC;
+        arbeitsliste = new List<>();
         interpretiere = false;
         timer = 2;
-        tokenList = new List<Scanner.Token>();
         parameter = new Parameter();
-    }
-
-
-    public void interpretieren(List ttokenlist){
-        ttokenlist.toFirst();
-        for(int i = 0; !ttokenlist.isEmpty();i++){
-            if(ttokenlist.getContent().equals(token)){
-
-            }
-        }
-
+        befehlsnummer = 0;
     }
 
     private void interpret(){
@@ -51,25 +42,30 @@ public class Interpreter extends GraphicalObject {
 
     private void interpret02(){
         try {
-            if (!scanner.getType().equals("NODATA")) {
-                if (scanner.getType().equals("bewegung")) {
+            if (!arbeitsliste.getContent().getType().equals("NODATA")) {
+                if (arbeitsliste.getContent().getType().equals("bewegung")) {
                     fuehreBewegungAus();
-                } else if (scanner.getType().equals("baum")) {
+                } else if (arbeitsliste.getContent().getType().equals("baum")) {
                     arbeiteAnBaum();
-                } else if (scanner.getType().equals("methodenaufruf")) {
-                    bearbeiteMethode(scanner.getThis(scanner.getValue()));
-                }else if (scanner.getType().equals("verzweigung")) {
+                } else if (arbeitsliste.getContent().getType().equals("methodenaufruf")) {
+                    bearbeiteMethode(scanner.getThis(arbeitsliste.getContent().getValue()));
+                }else if (arbeitsliste.getContent().getType().equals("verzweigung")) {
                     bearbeiteVerzweigung();
-                }else if (scanner.getType().equals("addieren")) {
-                    parameter.addiere(scanner.getValue());
-                }else if (scanner.getType().equals("subtrahieren")) {
-                    parameter.subtrahiere(scanner.getValue());
+                }else if (arbeitsliste.getContent().getType().equals("addieren")) {
+                    parameter.addiere(arbeitsliste.getContent().getValue());
+                }else if (arbeitsliste.getContent().getType().equals("subtrahieren")) {
+                    parameter.subtrahiere(arbeitsliste.getContent().getValue());
                 }
-                scanner.nextToken();
+                arbeitsliste.next();
+                befehlsnummer++;
                 timer = 2;
-            } else interpretiere = false;
+            } else{
+                interpretiere = false;
+                befehlsnummer = 0;
+            }
         }catch(Exception e){
             System.out.println("Error 2");
+            befehlsnummer = 0;
             interpretiere = false;
         }
     }
@@ -85,53 +81,42 @@ public class Interpreter extends GraphicalObject {
     public void start(CodeScanner scanner){
         this.scanner = scanner;
         scanner.tokenList.toFirst();
+        arbeitsliste = scanner.getTokenlist();
         interpretiere = true;
-        //interpret();
+        befehlsnummer = 0;
     }
 
     private void fuehreBewegungAus(){
-        if(scanner.getValue().equals("vor")){
+        if(arbeitsliste.getContent().getValue().equals("vor")){
             geheVor();
-        }else if(scanner.getValue().equals("rechtsUm")){
+        }else if(arbeitsliste.getContent().getValue().equals("rechtsUm")){
             vC.getBiber().setRichtung(1);
 
-        }else if(scanner.getValue().equals("linksUm")){
+        }else if(arbeitsliste.getContent().getValue().equals("linksUm")){
             vC.getBiber().setRichtung(-1);
         }
     }
 
     public void arbeiteAnBaum(){
-        if(scanner.getValue().equals("pflanzen")){
+        if(arbeitsliste.getContent().getValue().equals("pflanzen")){
             vC.getAktuellesFeld().erhoeheBaumAnzahl(1);
-        }else if(scanner.getValue().equals("ernten")){
+        }else if(arbeitsliste.getContent().getValue().equals("ernten")){
             if(vC.getAktuellesFeld().getBaumAnzahl() > 0 ){
                 vC.getAktuellesFeld().erhoeheBaumAnzahl(-1);
             }else JOptionPane.showMessageDialog(null, "Hier ist nichts zum ernten");
         }
+
     }
 
     private void bearbeiteMethode(Methode methode){
         methode.tokenList.toFirst();
         while(methode.tokenList.hasAccess()) {
-            if (methode.getValue().equals("vor")) {
-                geheVor();
-            } else if (methode.getValue().equals("rechtsUm")) {
-                vC.getBiber().setRichtung(1);
-            } else if (methode.getValue().equals("linksUm")) {
-                vC.getBiber().setRichtung(-1);
-            } else if (methode.getValue().equals("pflanzen")) {
-                vC.getAktuellesFeld().erhoeheBaumAnzahl(1);
-            } else if (methode.getValue().equals("ernten")) {
-                if(vC.getAktuellesFeld().getBaumAnzahl() > 0 ){
-                    vC.getAktuellesFeld().setBaumAnzahl(-1);
-                }else JOptionPane.showMessageDialog(null, "Hier ist nichts zum ernten");
-            }else if(methode.getType().equals("methodenaufruf")){
-                bearbeiteMethode(scanner.getThis(methode.getValue()));
-            }else if (methode.getType().equals("verzweigung")) {
-                bearbeiteVerzweigungInMethode(methode);
-            }
+            arbeitsliste.insert(methode.tokenList.getContent());
             methode.nextToken();
         }
+        arbeitsliste.remove();
+        geheInListeAnStelle(befehlsnummer - 1);
+
     }
 
     private void geheVor(){
@@ -158,15 +143,8 @@ public class Interpreter extends GraphicalObject {
         BedingungsCode diese = scanner.getVerzweigungsInfo(Integer.parseInt(scanner.getValue()));
         if(!diese.bedingungpruefen()){
             for(int i = 0; i < diese.anzahlbefehle(); i++){
-                scanner.nextToken();
-            }
-        }
-    }
-    private void bearbeiteVerzweigungInMethode(Methode methode){
-        BedingungsCode diese = scanner.getVerzweigungsInfo(Integer.parseInt(methode.getValue()));
-        if(!diese.bedingungpruefen()){
-            for(int i = 0; i < diese.anzahlbefehle(); i++){
-                methode.nextToken();
+                arbeitsliste.next();
+                befehlsnummer++;
             }
         }
     }
@@ -177,5 +155,18 @@ public class Interpreter extends GraphicalObject {
 
     public void setInterpretiere(boolean b){
         interpretiere = b;
+    }
+
+    public void parameterListeAufNull(){
+        parameter = new Parameter();
+    }
+
+    private void geheInListeAnStelle(int i){
+        arbeitsliste.toFirst();
+        befehlsnummer = i;
+        while(i>0){
+            arbeitsliste.next();
+            i--;
+        }
     }
 }

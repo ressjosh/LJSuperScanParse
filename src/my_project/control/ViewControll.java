@@ -35,6 +35,7 @@ public class ViewControll {
         biber.setHoehe(2);
         biber.removeRichtung();
         biber.setWeite(0);
+        cC.getInterpreter().setInterpretiere(false);
         for(int i = 0; i < 10; i++){
             for(int j = 0; j < 5; j++){
                 felder[i][j].setBaumAnzahl(0);
