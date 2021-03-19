@@ -23,7 +23,7 @@ public class Interpreter extends GraphicalObject {
         interpretiere = false;
         timer = 2;
         tokenList = new List<Scanner.Token>();
-        parameter = new Parameter(null);
+        parameter = new Parameter();
     }
 
 
@@ -155,7 +155,7 @@ public class Interpreter extends GraphicalObject {
     }
 
     private void bearbeiteVerzweigung(){
-        Verzweigung diese = scanner.getVerzweigungsInfo(Integer.parseInt(scanner.getValue()));
+        BedingungsCode diese = scanner.getVerzweigungsInfo(Integer.parseInt(scanner.getValue()));
         if(!diese.bedingungpruefen()){
             for(int i = 0; i < diese.anzahlbefehle(); i++){
                 scanner.nextToken();
@@ -163,7 +163,7 @@ public class Interpreter extends GraphicalObject {
         }
     }
     private void bearbeiteVerzweigungInMethode(Methode methode){
-        Verzweigung diese = scanner.getVerzweigungsInfo(Integer.parseInt(methode.getValue()));
+        BedingungsCode diese = scanner.getVerzweigungsInfo(Integer.parseInt(methode.getValue()));
         if(!diese.bedingungpruefen()){
             for(int i = 0; i < diese.anzahlbefehle(); i++){
                 methode.nextToken();

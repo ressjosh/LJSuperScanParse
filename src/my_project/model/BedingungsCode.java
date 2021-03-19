@@ -4,7 +4,7 @@ import my_project.control.ViewControll;
 
 import javax.swing.*;
 
-public class Verzweigung{
+public class BedingungsCode {
 
     private String bedingung;
     private int index;
@@ -14,7 +14,7 @@ public class Verzweigung{
     private ViewControll vC;
     private Interpreter interpreter;
 
-    public Verzweigung(CodeScanner scanner, Interpreter i, String bedingung,int anzahlbefehle, int verzweigungsindex, ViewControll vC) {
+    public BedingungsCode(CodeScanner scanner, Interpreter i, String bedingung, int anzahlbefehle, int verzweigungsindex, ViewControll vC) {
         System.out.println(bedingung);
         this.vC = vC;
         interpreter = i;

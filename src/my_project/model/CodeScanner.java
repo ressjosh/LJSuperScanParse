@@ -5,7 +5,6 @@ import my_project.control.CentralControll;
 import my_project.control.ViewControll;
 
 import javax.swing.*;
-import javax.xml.stream.events.Characters;
 
 
 public class CodeScanner extends Scanner<String,String> {
@@ -14,7 +13,7 @@ public class CodeScanner extends Scanner<String,String> {
     private String aktuelleBefehleString;
     private CodeParser parser;
     private List<Methode> methodenliste;
-    private List<Verzweigung> verzweigungen;
+    private List<BedingungsCode> bedingungsCodeliste;
     private ViewControll vC;
     private CentralControll cC;
 
@@ -23,7 +22,7 @@ public class CodeScanner extends Scanner<String,String> {
         this.vC = vC;
         parser = new CodeParser(this);
         methodenliste = new List<>();
-        verzweigungen = new List<>();
+        bedingungsCodeliste = new List<>();
     }
 
     @Override
@@ -80,7 +79,20 @@ public class CodeScanner extends Scanner<String,String> {
                 int anzahlRauten = 1;
                 i = i+4;
                 while(anzahlRauten!= 0){
-                    if (i+3 < input.length() && (input.substring(i, i+4)).equals("wenn")){
+                    if (i+3 < input.length() && (input.substring(i, i+4)).equals("wenn") || (input.substring(i, i+7)).equals("solange")){
+                        anzahlRauten++;
+                    }else if(input.charAt(i) == '#'){
+                        anzahlRauten--;
+                    }
+                    i++;
+                }
+            }else if (i+6 < input.length() && (input.substring(i, i+7)).equals("solange")) {
+                this.tokenList.append(new Token(""+i,"schleife"));
+                if(!scanneUndParseBedingung(i+6, i, null)) return false;
+                int anzahlRauten = 1;
+                i = i+7;
+                while(anzahlRauten!= 0){
+                    if (i+6 < input.length() && (input.substring(i, i+4)).equals("wenn") || (input.substring(i, i+7)).equals("solange")){
                         anzahlRauten++;
                     }else if(input.charAt(i) == '#'){
                         anzahlRauten--;
@@ -133,7 +145,7 @@ public class CodeScanner extends Scanner<String,String> {
     private boolean scanneCode(){
         methodenliste = new List<>();
         this.tokenList = new List();
-        verzweigungen = new List<>();
+        bedingungsCodeliste = new List<>();
         if(scan(aktuelleBefehleString)){
             this.tokenList.append(new Token("#","NODATA"));
             tokenList.toFirst();
@@ -202,7 +214,20 @@ public class CodeScanner extends Scanner<String,String> {
                 j = j+4;
                 int anzahlRauten = 1;
                 while(anzahlRauten!= 0){
-                    if (j+3 < input.length() && (input.substring(j, j+4)).equals("wenn")){
+                    if (j+3 < input.length() && (input.substring(j, j+4)).equals("wenn") || (input.substring(j, j+7)).equals("solange")){
+                        anzahlRauten++;
+                    }else if(input.charAt(j) == '#'){
+                        anzahlRauten--;
+                    }
+                    j++;
+                }
+            }else if (j+6 < input.length() && (input.substring(j, j+7)).equals("solange")) {
+                newMethod.tokenList.append(new Token(""+j,"schleife"));
+                if(!scanneUndParseBedingung(j+3, j, newMethod)) return false;
+                j = j+7;
+                int anzahlRauten = 1;
+                while(anzahlRauten!= 0){
+                    if (j+6 < input.length() && (input.substring(j, j+4)).equals("wenn") || (input.substring(j, j+7)).equals("solange")){
                         anzahlRauten++;
                     }else if(input.charAt(j) == '#'){
                         anzahlRauten--;
@@ -238,12 +263,12 @@ public class CodeScanner extends Scanner<String,String> {
         return methodenliste.getContent();
     }
 
-    public Verzweigung getVerzweigungsInfo(int index){
-        verzweigungen.toFirst();
-        while(verzweigungen.hasAccess() && verzweigungen.getContent().getMyIndex() != index){
-            verzweigungen.next();
+    public BedingungsCode getVerzweigungsInfo(int index){
+        bedingungsCodeliste.toFirst();
+        while(bedingungsCodeliste.hasAccess() && bedingungsCodeliste.getContent().getMyIndex() != index){
+            bedingungsCodeliste.next();
         }
-        return verzweigungen.getContent();
+        return bedingungsCodeliste.getContent();
     }
 
     private boolean scanneUndParseBedingung(int i, int bedingugnsIndex, Methode innerhalbMethode){
@@ -289,7 +314,7 @@ public class CodeScanner extends Scanner<String,String> {
             tmp++;
         }
         int anzahlbefehle = ermitteleAnzahlBefehle(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
-        verzweigungen.append(new Verzweigung(this, cC.getInterpreter(), bedingung, anzahlbefehle, bedingungsIndex, vC));
+        bedingungsCodeliste.append(new BedingungsCode(this, cC.getInterpreter(), bedingung, anzahlbefehle, bedingungsIndex, vC));
         if(innerhalbMethode == null){
             return scan(aktuelleBefehleString.substring(bedingungsIndex+5 + bedingung.length(), tmp-1));
         }else{

@@ -6,11 +6,9 @@ import javax.swing.*;
 
 public class Parameter extends KrasseListe<Integer, String>{
 
-    private CodeScanner scanner;
 
-    public Parameter(CodeScanner scanner) {
+    public Parameter() {
         this.tokenList = new List();
-        this.scanner = scanner;
     }
 
     public boolean addiere(String name){
