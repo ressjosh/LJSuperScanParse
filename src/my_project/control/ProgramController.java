@@ -37,7 +37,7 @@ public class ProgramController {
      */
     public void startProgram() {
         cC = new CentralControll(viewController);
-        viewController.getDrawFrame().setSize(630,320);
+        viewController.getDrawFrame().setSize(1300,580);
         viewController.getSoundController().loadSound("assets/yesyesyes.mp3","yes",false);
         viewController.getSoundController().loadSound("assets/nonono.mp3","no",false);
 

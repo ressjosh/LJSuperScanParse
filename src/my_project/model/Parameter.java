@@ -69,4 +69,8 @@ public class Parameter extends KrasseListe<Integer, String>{
         if(tokenList.hasAccess()) return true;
         return false;
     }
+
+    public List<Token<Integer, String>> gibParameter(){
+        return tokenList;
+    }
 }

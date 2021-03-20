@@ -128,8 +128,10 @@ public class BedingungsCode {
     }
 
     public void erhoeheAnzahlBefehle(){
-        System.out.println("Länge der SChleife:" + laenge);
         laenge++;
-        System.out.println("Länge der SChleife:" + laenge);
+    }
+
+    public void reduziereAnzahlBefehle(){
+        laenge--;
     }
 }

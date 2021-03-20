@@ -48,6 +48,7 @@ public class Interpreter extends GraphicalObject {
         }
         private void subEndpunkt(int endpunkt) {
             this.endpunkt = endpunkt;
+            bc.reduziereAnzahlBefehle();
         }
     }
 
@@ -96,7 +97,7 @@ public class Interpreter extends GraphicalObject {
 
     @Override
     public void update(double dt) {
-        timer = timer - 4*dt;
+        timer = timer - 7*dt;
         schleifePruefen();
         if(interpretiere && timer < 0){
             interpret02();
@@ -149,8 +150,6 @@ public class Interpreter extends GraphicalObject {
             aktiveSchleifen.toFirst();
             while(aktiveSchleifen.hasAccess()){
                 aktiveSchleifen.getContent().subEndpunkt(aktiveSchleifen.getContent().getEndpunkt()-1);
-
-                System.out.println("Die neue Endpunkt: " + aktiveSchleifen.getContent().getEndpunkt());
                 aktiveSchleifen.next();
             }
             arbeitsliste.remove();
@@ -174,7 +173,7 @@ public class Interpreter extends GraphicalObject {
                 vC.getBiber().setWeite(vC.getBiber().getWeite()+1);
             }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
         }else if(vC.getBiber().getRichtung() == 1){
-            if(vC.getBiber().getHoehe() < 5){
+            if(vC.getBiber().getHoehe() < 4){
                 vC.getBiber().setHoehe(vC.getBiber().getHoehe()+1);
             }else JOptionPane.showMessageDialog(null, "Aua! Eine Wand");
         }else if(vC.getBiber().getRichtung() == 2){
@@ -206,7 +205,6 @@ public class Interpreter extends GraphicalObject {
                 befehlsnummer++;
             }
         }else{
-            System.out.println("Wir fügen folgende Längeb hinzu:" + (befehlsnummer + diese.anzahlbefehle()));
             aktiveSchleifen.append(new Schleife(befehlsnummer,befehlsnummer + diese.anzahlbefehle(), diese));
         }
     }
@@ -216,7 +214,6 @@ public class Interpreter extends GraphicalObject {
         boolean gefunden = false;
         while(aktiveSchleifen.hasAccess() && !gefunden){
             if(befehlsnummer>aktiveSchleifen.getContent().getEndpunkt()){
-                System.out.println("Wir springen jetzt zurück bei folgendem Befehl: " + arbeitsliste.getContent().getValue());
                 befehlsnummer = aktiveSchleifen.getContent().getCheckpoint();
                 geheInListeAnStelle(befehlsnummer);
                 aktiveSchleifen.remove();

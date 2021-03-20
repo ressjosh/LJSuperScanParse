@@ -1,8 +1,10 @@
 package my_project.control;
 
 import KAGO_framework.control.ViewController;
+import KAGO_framework.model.abitur.datenstrukturen.List;
 import my_project.model.Biber;
 import my_project.model.Feld;
+import my_project.model.KrasseListe;
 import my_project.view.Ausgabefeld;
 import my_project.view.Eingabefeld;
 
@@ -13,14 +15,12 @@ public class ViewControll {
     private Eingabefeld eingabe;
     private CentralControll cC;
     private Ausgabefeld ausgabe;
-    private ViewController vC;
     private Feld[][] felder;
 
     public ViewControll(CentralControll central, ViewController vC) {
         cC = central;
         felder = new Feld[10][5];
         generateFields();
-        this.vC = vC;
         biber = new Biber();
         eingabe = new Eingabefeld(cC, this);
         ausgabe  = new Ausgabefeld(this);
@@ -61,5 +61,9 @@ public class ViewControll {
 
     public Feld[][] getFelder(){
         return felder;
+    }
+
+    public List<KrasseListe<Integer, String>.Token<Integer, String>> gibParameter(){
+        return cC.getInterpreter().getParameter().gibParameter();
     }
 }
