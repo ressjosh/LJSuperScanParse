@@ -10,7 +10,7 @@ public abstract class KrasseListe<TokenValue,TokenType> {
      * @param <Value> Der Datentyp des WERTES, den das Token hat. Zumeist String oder char.
      * @param <Type> Der Datentyp, der für den TYP des Tokens verwendet wird. Z.B. String, int oder ein Enum.
      */
-    protected class Token<Value,Type> {
+    public class Token<Value,Type> {
 
         private Value value;
         private Type type;

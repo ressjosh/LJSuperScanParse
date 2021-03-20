@@ -16,7 +16,40 @@ public class Interpreter extends GraphicalObject {
     private boolean interpretiere;
     private Parameter parameter;
     private List<KrasseListe<String,String>.Token<String, String>> arbeitsliste;
+    private List<Schleife> aktiveSchleifen;
     private int befehlsnummer;
+
+    private class Schleife {
+        private int checkpoint;
+        private int endpunkt;
+        private BedingungsCode bc;
+
+        public Schleife(int checkpoint, int endpunkt, BedingungsCode myBedingungsCode) {
+            this.checkpoint = checkpoint;
+            this.endpunkt = endpunkt;
+            this.bc = myBedingungsCode;
+        }
+
+        private int getCheckpoint() {
+            return checkpoint;
+        }
+
+        private int getEndpunkt() {
+            return endpunkt;
+        }
+
+        private void setCheckpoint(int checkpoint) {
+            this.checkpoint = checkpoint;
+        }
+
+        private void setEndpunkt(int endpunkt) {
+            this.endpunkt = endpunkt;
+            bc.erhoeheAnzahlBefehle();
+        }
+        private void subEndpunkt(int endpunkt) {
+            this.endpunkt = endpunkt;
+        }
+    }
 
     public Interpreter(CentralControll cC, ViewControll vC){
         this.cC = cC;
@@ -26,18 +59,7 @@ public class Interpreter extends GraphicalObject {
         timer = 2;
         parameter = new Parameter();
         befehlsnummer = 0;
-    }
-
-    private void interpret(){
-        scanner.tokenList.toFirst();
-        while(!scanner.getType().equals("NODATA")) {
-                if (scanner.getType().equals("bewegung")) {
-                    fuehreBewegungAus();
-                } else if (scanner.getType().equals("baum")) {
-                    arbeiteAnBaum();
-                }
-                scanner.nextToken();
-        }
+        aktiveSchleifen = new List<>();
     }
 
     private void interpret02(){
@@ -51,6 +73,8 @@ public class Interpreter extends GraphicalObject {
                     bearbeiteMethode(scanner.getThis(arbeitsliste.getContent().getValue()));
                 }else if (arbeitsliste.getContent().getType().equals("verzweigung")) {
                     bearbeiteVerzweigung();
+                }else if (arbeitsliste.getContent().getType().equals("schleife")) {
+                    bearbeiteSchleife();
                 }else if (arbeitsliste.getContent().getType().equals("addieren")) {
                     parameter.addiere(arbeitsliste.getContent().getValue());
                 }else if (arbeitsliste.getContent().getType().equals("subtrahieren")) {
@@ -73,6 +97,7 @@ public class Interpreter extends GraphicalObject {
     @Override
     public void update(double dt) {
         timer = timer - 4*dt;
+        schleifePruefen();
         if(interpretiere && timer < 0){
             interpret02();
         }
@@ -81,6 +106,7 @@ public class Interpreter extends GraphicalObject {
     public void start(CodeScanner scanner){
         this.scanner = scanner;
         scanner.tokenList.toFirst();
+        aktiveSchleifen = new List<>();
         arbeitsliste = scanner.getTokenlist();
         interpretiere = true;
         befehlsnummer = 0;
@@ -109,13 +135,36 @@ public class Interpreter extends GraphicalObject {
     }
 
     private void bearbeiteMethode(Methode methode){
-        methode.tokenList.toFirst();
-        while(methode.tokenList.hasAccess()) {
-            arbeitsliste.insert(methode.tokenList.getContent());
-            methode.nextToken();
+        if(aktiveSchleife()){
+            methode.tokenList.toFirst();
+            while(methode.tokenList.hasAccess()) {
+                arbeitsliste.insert(methode.tokenList.getContent());
+                aktiveSchleifen.toFirst();
+                while(aktiveSchleifen.hasAccess()){
+                    aktiveSchleifen.getContent().setEndpunkt(aktiveSchleifen.getContent().getEndpunkt()+1);
+                    aktiveSchleifen.next();
+                }
+                methode.nextToken();
+            }
+            aktiveSchleifen.toFirst();
+            while(aktiveSchleifen.hasAccess()){
+                aktiveSchleifen.getContent().subEndpunkt(aktiveSchleifen.getContent().getEndpunkt()-1);
+
+                System.out.println("Die neue Endpunkt: " + aktiveSchleifen.getContent().getEndpunkt());
+                aktiveSchleifen.next();
+            }
+            arbeitsliste.remove();
+            geheInListeAnStelle(befehlsnummer-1);
+        }else{
+            methode.tokenList.toFirst();
+            while(methode.tokenList.hasAccess()) {
+                arbeitsliste.insert(methode.tokenList.getContent());
+                methode.nextToken();
+            }
+            arbeitsliste.remove();
+            geheInListeAnStelle(befehlsnummer-1);
         }
-        arbeitsliste.remove();
-        geheInListeAnStelle(befehlsnummer - 1);
+
 
     }
 
@@ -149,6 +198,34 @@ public class Interpreter extends GraphicalObject {
         }
     }
 
+    private void bearbeiteSchleife(){
+        BedingungsCode diese = scanner.getVerzweigungsInfo(Integer.parseInt(scanner.getValue()));
+        if(!diese.bedingungpruefen()){
+            for(int i = 0; i < diese.anzahlbefehle(); i++){
+                arbeitsliste.next();
+                befehlsnummer++;
+            }
+        }else{
+            System.out.println("Wir fügen folgende Längeb hinzu:" + (befehlsnummer + diese.anzahlbefehle()));
+            aktiveSchleifen.append(new Schleife(befehlsnummer,befehlsnummer + diese.anzahlbefehle(), diese));
+        }
+    }
+
+    private void schleifePruefen(){
+        aktiveSchleifen.toFirst();
+        boolean gefunden = false;
+        while(aktiveSchleifen.hasAccess() && !gefunden){
+            if(befehlsnummer>aktiveSchleifen.getContent().getEndpunkt()){
+                System.out.println("Wir springen jetzt zurück bei folgendem Befehl: " + arbeitsliste.getContent().getValue());
+                befehlsnummer = aktiveSchleifen.getContent().getCheckpoint();
+                geheInListeAnStelle(befehlsnummer);
+                aktiveSchleifen.remove();
+                gefunden = true;
+            }else aktiveSchleifen.next();
+
+        }
+    }
+
     public Parameter getParameter(){
         return parameter;
     }
@@ -168,5 +245,10 @@ public class Interpreter extends GraphicalObject {
             arbeitsliste.next();
             i--;
         }
+    }
+
+    private boolean aktiveSchleife(){
+        if(aktiveSchleifen.isEmpty()) return false;
+        return true;
     }
 }

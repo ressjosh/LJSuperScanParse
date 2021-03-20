@@ -15,7 +15,6 @@ public class BedingungsCode {
     private Interpreter interpreter;
 
     public BedingungsCode(CodeScanner scanner, Interpreter i, String bedingung, int anzahlbefehle, int verzweigungsindex, ViewControll vC) {
-        System.out.println(bedingung);
         this.vC = vC;
         interpreter = i;
         this.scanner = scanner;
@@ -126,5 +125,11 @@ public class BedingungsCode {
             return interpreter.getParameter().gibWert(zahl);
         }
         return Integer.parseInt(zahl);
+    }
+
+    public void erhoeheAnzahlBefehle(){
+        System.out.println("Länge der SChleife:" + laenge);
+        laenge++;
+        System.out.println("Länge der SChleife:" + laenge);
     }
 }

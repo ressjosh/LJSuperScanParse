@@ -37,7 +37,6 @@ public class Parameter extends KrasseListe<Integer, String>{
 
     public boolean legeParameterAn(String name, String wert){
         String input = wert.trim();
-        System.out.println("Parameter wurde erstellt:" + name);
         try {
             int temp = 0;
             char[] tmp = input.toCharArray();
@@ -65,7 +64,6 @@ public class Parameter extends KrasseListe<Integer, String>{
     public boolean istParameter(String potentielleZahl){
         tokenList.toFirst();
         while(tokenList.hasAccess() && !getType().equals(potentielleZahl)){
-            System.out.println(getType() + ":" + potentielleZahl + ":");
             nextToken();
         }
         if(tokenList.hasAccess()) return true;
