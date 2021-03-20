@@ -42,51 +42,6 @@ public class ProgramController {
         viewController.getSoundController().loadSound("assets/nonono.mp3","no",false);
 
     }
-
-    /**
-     *ring ein Wort der Sprache des Parsers ist.
-     */
-   /* public boolean parseString(String input, int parserIndex){
-        switch(parserIndex){
-            case 0:
-                return knebiParser.parse(input);
-
-            // todo Hier können weitere Parser aufgeführt werden
-            case 1:
-                return lJParser.parse(input);
-
-            case 2:
-                return lJParserProVersion.parse(input);
-
-            default: System.out.println("\nDebug-Info: Für diesen Index ist kein Parser definiert!");
-        }
-        return false;
-    }
-
-    /**
-     * Der übergebene String wird gescannt.
-     * @param input der zu scannende String
-     * @param parserIndex der zu verwendende Scanner (ist dem Parser zugeordnet, daher Parserindex)
-     * @return true, falls der Scan erfolgreich war, andernfalls false
-     */
-    /*public boolean scanString(String input, int parserIndex){
-        switch(parserIndex){
-            case 0:
-                boolean result = knebiParser.getScannerResult(input);
-                System.out.println("\n- KnebiScanner-DEBUG - "+knebiParser.getScannerOutput());
-                return result;
-            // todo Hier können weitere Scanner aufgeführt werden.
-            case 1:
-                return lJParser.getScannerResult(input);
-
-            case 2:
-                return lJParserProVersion.getScannerResult(input);
-
-            default: System.out.println("\nDebug-Info: Für diesen Index ist kein Scanner definiert!");
-        }
-        return false;
-    }
-
     // ********* FRAMEWORK-METHODEN *************
 
     /**
