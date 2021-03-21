@@ -21,6 +21,7 @@ public class Eingabefeld {
     private JTextPane outputPane;
     private JButton newCodeButton;
     private JTextArea input;
+    private JButton anleitungButton;
     private JSpinner languageIndex;
     private JLabel languageLabel;
     private JCheckBox soundCheckBox;
@@ -54,6 +55,12 @@ public class Eingabefeld {
                 vC.biberToStart();
                 executeButton.setEnabled(true);
                 input.setEnabled(true);
+            }
+        });
+        anleitungButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vC.anleitungVisible(true);
             }
         });
     }

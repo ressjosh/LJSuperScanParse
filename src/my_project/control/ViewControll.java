@@ -5,6 +5,7 @@ import KAGO_framework.model.abitur.datenstrukturen.List;
 import my_project.model.Biber;
 import my_project.model.Feld;
 import my_project.model.KrasseListe;
+import my_project.view.Anleitung;
 import my_project.view.Ausgabefeld;
 import my_project.view.Eingabefeld;
 
@@ -16,6 +17,7 @@ public class ViewControll {
     private CentralControll cC;
     private Ausgabefeld ausgabe;
     private Feld[][] felder;
+    private Anleitung anleitung;
 
     public ViewControll(CentralControll central, ViewController vC) {
         cC = central;
@@ -24,6 +26,7 @@ public class ViewControll {
         biber = new Biber();
         eingabe = new Eingabefeld(cC, this);
         ausgabe  = new Ausgabefeld(this);
+        anleitung = new Anleitung(this);
         vC.draw(ausgabe);
     }
 
@@ -65,5 +68,9 @@ public class ViewControll {
 
     public List<KrasseListe<Integer, String>.Token<Integer, String>> gibParameter(){
         return cC.getInterpreter().getParameter().gibParameter();
+    }
+
+    public void anleitungVisible(boolean b){
+        anleitung.setVisible(b);
     }
 }
